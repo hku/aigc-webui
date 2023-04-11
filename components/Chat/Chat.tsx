@@ -22,11 +22,13 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
+import { AddinModifier, AddinModifierID } from '@/types/addin';
 
 interface Props {
   conversation: Conversation;
   models: AddonModel[];
   defaultModelId: AddonModelID;
+  addinModifiers: AddinModifier[];
   FreeSystemPromptModelIDs: AddonModelID[];
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
@@ -35,6 +37,7 @@ interface Props {
   onSend: (
     message: Message,
     deleteCount: number,
+    addinId: AddinModifierID | null,
   ) => void;
   onUpdateConversation: (
     conversation: Conversation,
@@ -49,6 +52,7 @@ export const Chat: FC<Props> = memo(
     conversation,
     models,
     defaultModelId,
+    addinModifiers,
     FreeSystemPromptModelIDs,
     messageIsStreaming,
     modelError,
@@ -59,6 +63,7 @@ export const Chat: FC<Props> = memo(
     onEditMessage,
     stopConversationRef,
   }) => {
+
     const { t } = useTranslation('chat');
     const [currentMessage, setCurrentMessage] = useState<Message>();
     const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
@@ -252,19 +257,20 @@ export const Chat: FC<Props> = memo(
             </div>
 
             <ChatInput
+              addinModifiers = {addinModifiers}
               stopConversationRef={stopConversationRef}
               textareaRef={textareaRef}
               messageIsStreaming={messageIsStreaming}
               conversationIsEmpty={conversation.messages.length === 0}
               model={conversation.model}
               prompts={prompts}
-              onSend={(message) => {
+              onSend={(message, addinId) => {
                 setCurrentMessage(message);
-                onSend(message, 0);
+                onSend(message, 0, addinId);
               }}
               onRegenerate={() => {
                 if (currentMessage) {
-                  onSend(currentMessage, 2);
+                  onSend(currentMessage, 2, null);
                 }
               }}
             />

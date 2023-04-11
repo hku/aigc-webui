@@ -39,15 +39,22 @@ import { v4 as uuidv4 } from 'uuid';
 
 import addonsManifest from "../addons-manifest.json"
 
+import addinsManifest from "../addins-manifest.json"
+
+
+import { AddinModifier, AddinModifierID } from '@/types/addin';
+
 const addonsIds = addonsManifest as string[]
 
 interface HomeProps {
   defaultModelId: AddonModelID;
+  addinModifiers:  AddinModifier[];
   FreeSystemPromptModelIDs: AddonModelID[]
 }
 
 const Home: React.FC<HomeProps> = ({
   defaultModelId,
+  addinModifiers,
   FreeSystemPromptModelIDs
 }) => {
   const { t } = useTranslation('chat');
@@ -83,6 +90,7 @@ const Home: React.FC<HomeProps> = ({
   const handleSend = async (
     message: Message,
     deleteCount = 0,
+    addinId: AddinModifierID | null = null
   ) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
@@ -112,6 +120,7 @@ const Home: React.FC<HomeProps> = ({
         model: updatedConversation.model,
         messages: updatedConversation.messages,
         prompt: updatedConversation.prompt,
+        addinId
       };
 
       const endpoint = getEndpoint();
@@ -248,13 +257,12 @@ const Home: React.FC<HomeProps> = ({
       code: null,
       messageLines: [
         t(
-          'Make sure your OpenAI API key is set in the bottom left of the sidebar.',
+          'an error when fetch models',
         ),
-        t('If you completed this step, OpenAI may be experiencing issues.'),
       ],
     } as ErrorMessage;
 
-    const response = await fetch('/api/models', {
+    const response = await fetch('/api/addons', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -566,7 +574,8 @@ const Home: React.FC<HomeProps> = ({
       setLightMode(theme as 'dark' | 'light');
     }
 
-
+    
+    
     if (window.innerWidth < 640) {
       setShowSidebar(false);
     }
@@ -692,6 +701,7 @@ const Home: React.FC<HomeProps> = ({
                 conversation={selectedConversation}
                 messageIsStreaming={messageIsStreaming}
                 defaultModelId={defaultModelId}
+                addinModifiers = {addinModifiers}
                 FreeSystemPromptModelIDs={FreeSystemPromptModelIDs}
                 modelError={modelError}
                 models={models}
@@ -752,7 +762,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
 
-
+    
     const FreeSystemPromptModelIDs: AddonModelID[] = []
     for (const name of addonsIds) {
       const scriptModule = await import(`../addons/${name}/model.ts`);
@@ -762,11 +772,19 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       }
     }
   
-
+  const addinModifiers: AddinModifier[] = []
+  
+  for (const name of addinsManifest) {
+    const scriptModule = await import(`../addins/${name}`);
+    const metadata = scriptModule.metadata
+      addinModifiers.push({id: name, ...metadata})
+  }
+  
   return {
     props: {
       defaultModelId,
       FreeSystemPromptModelIDs,
+      addinModifiers,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',

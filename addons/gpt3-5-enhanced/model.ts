@@ -14,7 +14,10 @@ const replicate = new Replicate({
 
 export const metadata = {
     name: 'gpt-3.5-enhanced',
-    description: 'This is a model agent of chatGPT enhanced by stable diffusion and riffusion, which can generate images and musics.'
+    description: `
+This is a model agent of chatGPT enhanced by stable diffusion and riffusion, which can generate images and musics.
+The favorable language for Image and Music generation is English.
+`
 }
 
 export default async function generate(messages: Message[], prompt='') {

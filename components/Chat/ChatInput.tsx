@@ -2,6 +2,8 @@ import { Message } from '@/types/chat';
 import { AddonModel } from '@/types/addon';
 import { Prompt } from '@/types/prompt';
 import {
+  IconPrompt,
+  IconLanguage,
   IconBolt,
   IconBrandGoogle,
   IconPlayerStop,
@@ -20,13 +22,18 @@ import {
 } from 'react';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import { AddinModifier, AddinModifierID } from '@/types/addin';
+import { AddinSelect } from './AddinSelect';
+import ICONS_DICT from '../icons';
+
 
 interface Props {
   messageIsStreaming: boolean;
   model: AddonModel;
+  addinModifiers: AddinModifier[];
   conversationIsEmpty: boolean;
   prompts: Prompt[];
-  onSend: (message: Message) => void;
+  onSend: (message: Message, addinId: AddinModifierID | null) => void;
   onRegenerate: () => void;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
@@ -35,6 +42,7 @@ interface Props {
 export const ChatInput: FC<Props> = ({
   messageIsStreaming,
   model,
+  addinModifiers,
   conversationIsEmpty,
   prompts,
   onSend,
@@ -42,6 +50,7 @@ export const ChatInput: FC<Props> = ({
   stopConversationRef,
   textareaRef,
 }) => {
+
   const { t } = useTranslation('chat');
 
   const [content, setContent] = useState<string>();
@@ -51,6 +60,8 @@ export const ChatInput: FC<Props> = ({
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showAddinSelect, serShowAddinSelect] = useState(false);
+  const [addinId, setAddinId] = useState<AddinModifierID | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
@@ -76,7 +87,8 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    onSend({ role: 'user', content });
+
+    onSend({ role: 'user', content}, addinId);
     setContent('');
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
@@ -233,6 +245,18 @@ export const ChatInput: FC<Props> = ({
     };
   }, []);
 
+  const getPromptIcon = (addinId: AddinModifierID | null) => {
+    if(addinId) {
+
+      const theAddin = addinModifiers.find(a=>a.id===addinId)
+      if(theAddin && theAddin.icon && ICONS_DICT[theAddin.icon]) {
+        
+        return ICONS_DICT[theAddin.icon]
+      }
+    }
+    return ICONS_DICT["IconPrompt"] || <IconPrompt size={20} />
+  }
+
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
       <div className="stretch mx-2 mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:mt-[52px] md:last:mb-6 lg:mx-auto lg:max-w-3xl">
@@ -255,10 +279,41 @@ export const ChatInput: FC<Props> = ({
         )}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+          <button
+            className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+            onClick={() => serShowAddinSelect(!showAddinSelect)}
+            onKeyDown={(e) => {}}
+          >
+            {getPromptIcon(addinId)}
+          </button>
+
+          {showAddinSelect && (
+            <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">
+              <AddinSelect
+                addinModifiers = {addinModifiers}
+                addinId={addinId}
+                onKeyDown={(e: any) => {
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    serShowAddinSelect(false);
+                    textareaRef.current?.focus();
+                  }
+                }}
+                 onAddinChange={(addinId: AddinModifierID | null) => {
+                  setAddinId(addinId);
+                  serShowAddinSelect(false);
+
+                  if (textareaRef && textareaRef.current) {
+                    textareaRef.current.focus();
+                  }
+                }}
+              />
+            </div>
+          )}
 
           <textarea
             ref={textareaRef}
-            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-2 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-2"
+            className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
             style={{
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,

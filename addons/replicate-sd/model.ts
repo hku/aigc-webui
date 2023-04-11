@@ -7,7 +7,10 @@ const replicate = new Replicate({
 
 export const metadata = {
     name: 'stable-diffusion-replicate',
-    description: 'This is a model agent for image generation powered by stable-diffusion api on replicate'
+    description: `
+This is a model agent for image generation powered by stable-diffusion api on replicate.
+The favorable language for this model is English.    
+`
 }
 
 export default async function generate(messages: Message[], prompt='') {

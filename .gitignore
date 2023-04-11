@@ -16,6 +16,8 @@
 
 # production
 /build
+addins-manifest.json
+addons-manifest.json
 
 # misc
 .DS_Store

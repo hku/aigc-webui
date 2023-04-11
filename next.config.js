@@ -17,6 +17,19 @@ const nextConfig = {
 
     if(isServer) {
       try {  
+        const addinsPath = path.join(__dirname, 'addins');
+        const addins = fs.readdirSync(addinsPath, { withFileTypes: true }).filter(
+          file => file.isDirectory()
+        ).map(file=>file.name);
+        
+        const manifestPath = path.join(__dirname, 'addins-manifest.json');
+        fs.writeFileSync(manifestPath, JSON.stringify(addins));
+
+      } catch (err) {
+        console.error(err);
+      }
+
+      try {  
         const addonsPath = path.join(__dirname, 'addons');
         const addons = fs.readdirSync(addonsPath, { withFileTypes: true }).filter(
           file => file.isDirectory()
@@ -28,6 +41,8 @@ const nextConfig = {
       } catch (err) {
         console.error(err);
       }
+
+
     }
 
     return config;
