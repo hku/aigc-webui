@@ -1,5 +1,4 @@
 import { Conversation } from '@/types/chat';
-import { OpenAIModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { useTranslation } from 'next-i18next';
@@ -43,17 +42,6 @@ export const SystemPrompt: FC<Props> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    const maxLength = conversation.model.maxLength;
-
-    if (value.length > maxLength) {
-      alert(
-        t(
-          `Prompt limit is {{maxLength}} characters. You have entered {{valueLength}} characters.`,
-          { maxLength, valueLength: value.length },
-        ),
-      );
-      return;
-    }
 
     setValue(value);
     updatePromptListVisibility(value);

@@ -8,12 +8,11 @@ import { ErrorMessage } from '@/types/error';
 import { LatestExportFormat, SupportedExportFormats } from '@/types/export';
 import { Folder, FolderType } from '@/types/folder';
 import {
-  OpenAIModel,
-  OpenAIModelID,
-  OpenAIModels,
+  AddonModel,
+  AddonModelID,
+  AndonModels,
   fallbackModelID,
-} from '@/types/openai';
-import { Plugin, PluginKey } from '@/types/plugin';
+} from '@/types/addon';
 import { Prompt } from '@/types/prompt';
 import { getEndpoint } from '@/utils/app/api';
 import {
@@ -38,30 +37,30 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { v4 as uuidv4 } from 'uuid';
 
+import addonsManifest from "../addons-manifest.json"
+
+const addonsIds = addonsManifest as string[]
+
 interface HomeProps {
-  serverSideApiKeyIsSet: boolean;
-  serverSidePluginKeysSet: boolean;
-  defaultModelId: OpenAIModelID;
+  defaultModelId: AddonModelID;
+  FreeSystemPromptModelIDs: AddonModelID[]
 }
 
 const Home: React.FC<HomeProps> = ({
-  serverSideApiKeyIsSet,
-  serverSidePluginKeysSet,
   defaultModelId,
+  FreeSystemPromptModelIDs
 }) => {
   const { t } = useTranslation('chat');
 
   // STATE ----------------------------------------------
 
-  const [apiKey, setApiKey] = useState<string>('');
-  const [pluginKeys, setPluginKeys] = useState<PluginKey[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
 
   const [modelError, setModelError] = useState<ErrorMessage | null>(null);
 
-  const [models, setModels] = useState<OpenAIModel[]>([]);
+  const [models, setModels] = useState<AddonModel[]>([]);
 
   const [folders, setFolders] = useState<Folder[]>([]);
 
@@ -84,7 +83,6 @@ const Home: React.FC<HomeProps> = ({
   const handleSend = async (
     message: Message,
     deleteCount = 0,
-    plugin: Plugin | null = null,
   ) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
@@ -113,26 +111,14 @@ const Home: React.FC<HomeProps> = ({
       const chatBody: ChatBody = {
         model: updatedConversation.model,
         messages: updatedConversation.messages,
-        key: apiKey,
         prompt: updatedConversation.prompt,
       };
 
-      const endpoint = getEndpoint(plugin);
+      const endpoint = getEndpoint();
       let body;
 
-      if (!plugin) {
-        body = JSON.stringify(chatBody);
-      } else {
-        body = JSON.stringify({
-          ...chatBody,
-          googleAPIKey: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-          googleCSEId: pluginKeys
-            .find((key) => key.pluginId === 'google-search')
-            ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-        });
-      }
+      body = JSON.stringify(chatBody);
+  
 
       const controller = new AbortController();
       const response = await fetch(endpoint, {
@@ -159,7 +145,6 @@ const Home: React.FC<HomeProps> = ({
         return;
       }
 
-      if (!plugin) {
         if (updatedConversation.messages.length === 1) {
           const { content } = message;
           const customName =
@@ -226,9 +211,10 @@ const Home: React.FC<HomeProps> = ({
             setSelectedConversation(updatedConversation);
           }
         }
-        console.log('-----------')
-        console.log(JSON.stringify(updatedConversation.messages.slice(-1)[0]))
-        console.log('-----------')
+
+        // console.log('-----------')
+        // console.log(JSON.stringify(updatedConversation.messages.slice(-1)[0]))
+        // console.log('-----------')
         
         saveConversation(updatedConversation);
 
@@ -250,48 +236,13 @@ const Home: React.FC<HomeProps> = ({
         saveConversations(updatedConversations);
 
         setMessageIsStreaming(false);
-      } else {
-        const { answer } = await response.json();
 
-        const updatedMessages: Message[] = [
-          ...updatedConversation.messages,
-          { role: 'assistant', content: answer },
-        ];
-
-        updatedConversation = {
-          ...updatedConversation,
-          messages: updatedMessages,
-        };
-
-        setSelectedConversation(updatedConversation);
-        saveConversation(updatedConversation);
-
-        const updatedConversations: Conversation[] = conversations.map(
-          (conversation) => {
-            if (conversation.id === selectedConversation.id) {
-              return updatedConversation;
-            }
-
-            return conversation;
-          },
-        );
-
-        if (updatedConversations.length === 0) {
-          updatedConversations.push(updatedConversation);
-        }
-
-        setConversations(updatedConversations);
-        saveConversations(updatedConversations);
-
-        setLoading(false);
-        setMessageIsStreaming(false);
-      }
     }
   };
 
   // FETCH MODELS ----------------------------------------------
 
-  const fetchModels = async (key: string) => {
+  const fetchModels = async () => {
     const error = {
       title: t('Error fetching models.'),
       code: null,
@@ -307,10 +258,7 @@ const Home: React.FC<HomeProps> = ({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        key,
-      }),
+      }
     });
 
     if (!response.ok) {
@@ -343,49 +291,7 @@ const Home: React.FC<HomeProps> = ({
     localStorage.setItem('theme', mode);
   };
 
-  const handleApiKeyChange = (apiKey: string) => {
-    setApiKey(apiKey);
-    localStorage.setItem('apiKey', apiKey);
-  };
 
-  const handlePluginKeyChange = (pluginKey: PluginKey) => {
-    if (pluginKeys.some((key) => key.pluginId === pluginKey.pluginId)) {
-      const updatedPluginKeys = pluginKeys.map((key) => {
-        if (key.pluginId === pluginKey.pluginId) {
-          return pluginKey;
-        }
-
-        return key;
-      });
-
-      setPluginKeys(updatedPluginKeys);
-
-      localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
-    } else {
-      setPluginKeys([...pluginKeys, pluginKey]);
-
-      localStorage.setItem(
-        'pluginKeys',
-        JSON.stringify([...pluginKeys, pluginKey]),
-      );
-    }
-  };
-
-  const handleClearPluginKey = (pluginKey: PluginKey) => {
-    const updatedPluginKeys = pluginKeys.filter(
-      (key) => key.pluginId !== pluginKey.pluginId,
-    );
-
-    if (updatedPluginKeys.length === 0) {
-      setPluginKeys([]);
-      localStorage.removeItem('pluginKeys');
-      return;
-    }
-
-    setPluginKeys(updatedPluginKeys);
-
-    localStorage.setItem('pluginKeys', JSON.stringify(updatedPluginKeys));
-  };
 
   const handleToggleChatbar = () => {
     setShowSidebar(!showSidebar);
@@ -488,10 +394,9 @@ const Home: React.FC<HomeProps> = ({
       name: `${t('New Conversation')}`,
       messages: [],
       model: lastConversation?.model || {
-        id: OpenAIModels[defaultModelId].id,
-        name: OpenAIModels[defaultModelId].name,
-        maxLength: OpenAIModels[defaultModelId].maxLength,
-        tokenLimit: OpenAIModels[defaultModelId].tokenLimit,
+        id: AndonModels[defaultModelId].id,
+        name: AndonModels[defaultModelId].name,
+        description: AndonModels[defaultModelId].description
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
@@ -525,7 +430,7 @@ const Home: React.FC<HomeProps> = ({
         id: uuidv4(),
         name: 'New conversation',
         messages: [],
-        model: OpenAIModels[defaultModelId],
+        model: AndonModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
       });
@@ -559,7 +464,7 @@ const Home: React.FC<HomeProps> = ({
       id: uuidv4(),
       name: 'New conversation',
       messages: [],
-      model: OpenAIModels[defaultModelId],
+      model: AndonModels[defaultModelId],
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,
     });
@@ -605,7 +510,7 @@ const Home: React.FC<HomeProps> = ({
       name: `Prompt ${prompts.length + 1}`,
       description: '',
       content: '',
-      model: OpenAIModels[defaultModelId],
+      model: AndonModels[defaultModelId],
       folderId: null,
     };
 
@@ -650,10 +555,8 @@ const Home: React.FC<HomeProps> = ({
   }, [selectedConversation]);
 
   useEffect(() => {
-    if (apiKey) {
-      fetchModels(apiKey);
-    }
-  }, [apiKey]);
+      fetchModels();
+  }, []);
 
   // ON LOAD --------------------------------------------
 
@@ -663,23 +566,6 @@ const Home: React.FC<HomeProps> = ({
       setLightMode(theme as 'dark' | 'light');
     }
 
-    const apiKey = localStorage.getItem('apiKey');
-    if (serverSideApiKeyIsSet) {
-      fetchModels('');
-      setApiKey('');
-      localStorage.removeItem('apiKey');
-    } else if (apiKey) {
-      setApiKey(apiKey);
-      fetchModels(apiKey);
-    }
-
-    const pluginKeys = localStorage.getItem('pluginKeys');
-    if (serverSidePluginKeysSet) {
-      setPluginKeys([]);
-      localStorage.removeItem('pluginKeys');
-    } else if (pluginKeys) {
-      setPluginKeys(JSON.parse(pluginKeys));
-    }
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
@@ -728,18 +614,18 @@ const Home: React.FC<HomeProps> = ({
         id: uuidv4(),
         name: 'New conversation',
         messages: [],
-        model: OpenAIModels[defaultModelId],
+        model: AndonModels[defaultModelId],
         prompt: DEFAULT_SYSTEM_PROMPT,
         folderId: null,
       });
     }
-  }, [serverSideApiKeyIsSet]);
+  }, []);
 
   return (
     <>
       <Head>
-        <title>Chatbot UI</title>
-        <meta name="description" content="ChatGPT but better." />
+        <title>AIGC-webui</title>
+        <meta name="description" content="AIGC webui" />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"
@@ -760,15 +646,12 @@ const Home: React.FC<HomeProps> = ({
           <div className="flex h-full w-full pt-[48px] sm:pt-0">
             {showSidebar ? (
               <div>
+                {/* left side bar */}
                 <Chatbar
                   loading={messageIsStreaming}
                   conversations={conversations}
                   lightMode={lightMode}
                   selectedConversation={selectedConversation}
-                  apiKey={apiKey}
-                  serverSideApiKeyIsSet={serverSideApiKeyIsSet}
-                  pluginKeys={pluginKeys}
-                  serverSidePluginKeysSet={serverSidePluginKeysSet}
                   folders={folders.filter((folder) => folder.type === 'chat')}
                   onToggleLightMode={handleLightMode}
                   onCreateFolder={(name) => handleCreateFolder(name, 'chat')}
@@ -778,12 +661,9 @@ const Home: React.FC<HomeProps> = ({
                   onSelectConversation={handleSelectConversation}
                   onDeleteConversation={handleDeleteConversation}
                   onUpdateConversation={handleUpdateConversation}
-                  onApiKeyChange={handleApiKeyChange}
                   onClearConversations={handleClearConversations}
                   onExportConversations={handleExportData}
                   onImportConversations={handleImportConversations}
-                  onPluginKeyChange={handlePluginKeyChange}
-                  onClearPluginKey={handleClearPluginKey}
                 />
 
                 <button
@@ -808,11 +688,11 @@ const Home: React.FC<HomeProps> = ({
 
             <div className="flex flex-1">
               <Chat
+
                 conversation={selectedConversation}
                 messageIsStreaming={messageIsStreaming}
-                apiKey={apiKey}
-                serverSideApiKeyIsSet={serverSideApiKeyIsSet}
                 defaultModelId={defaultModelId}
+                FreeSystemPromptModelIDs={FreeSystemPromptModelIDs}
                 modelError={modelError}
                 models={models}
                 loading={loading}
@@ -866,26 +746,27 @@ export default Home;
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
-      Object.values(OpenAIModelID).includes(
-        process.env.DEFAULT_MODEL as OpenAIModelID,
+      addonsIds.includes(
+        process.env.DEFAULT_MODEL as AddonModelID,
       ) &&
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
 
-  let serverSidePluginKeysSet = false;
 
-  const googleApiKey = process.env.GOOGLE_API_KEY;
-  const googleCSEId = process.env.GOOGLE_CSE_ID;
-
-  if (googleApiKey && googleCSEId) {
-    serverSidePluginKeysSet = true;
-  }
+    const FreeSystemPromptModelIDs: AddonModelID[] = []
+    for (const name of addonsIds) {
+      const scriptModule = await import(`../addons/${name}/model.ts`);
+      const metadata = scriptModule.metadata
+      if(metadata?.freeSystemPrompt) {
+        FreeSystemPromptModelIDs.push(name)
+      }
+    }
+  
 
   return {
     props: {
-      serverSideApiKeyIsSet: !!process.env.OPENAI_API_KEY,
       defaultModelId,
-      serverSidePluginKeysSet,
+      FreeSystemPromptModelIDs,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',

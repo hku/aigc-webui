@@ -11,11 +11,16 @@ const handler = async (req: Request): Promise<Response> => {
     
     const chatbody = (await req.json()) as ChatBody;
 
-    const { messages, prompt } = chatbody;
+    const { messages, prompt, model } = chatbody;
 
-    console.log(`handler: ${messages}`)
+    const lastMessage = messages.slice(-1)[0]
+    const lastContent = lastMessage.content.trim()
+    if(/(!!!|！！！)$/.test(lastContent) && lastMessage.role === 'user') {
+      messages.slice(-1)[0].content = lastContent.replace(/(!|！)+$/, ', please respond using json format')
+      console.log(`last message content: ${messages.slice(-1)[0].content}`)
+    }
 
-    const res = await modelAgent.generate(messages, prompt)
+    const res = await modelAgent.generate(messages, prompt, model.id)
 
     return new Response(res);
 

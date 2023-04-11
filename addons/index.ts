@@ -53,15 +53,16 @@ class ModelAgent {
           cb()
     }
 
-    async generate(messages: Message[], prompt: string) {
-        const obj = this._object[this._activeKey]
+    async generate(messages: Message[], prompt: string, key = 'gpt3-5') {
+        this.active = key;
+        const obj = this._object[this.active]
         return await obj.default(messages, prompt)
     }
   }
 
 const modelAgent =  new ModelAgent({})
 modelAgent.loadAddons(addonsManifest, ()=>{
-    modelAgent.active = 'gpt3-5-sd'
+    modelAgent.active = 'gpt3-5'
 })
 
 export default modelAgent

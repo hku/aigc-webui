@@ -1,6 +1,6 @@
 import { Message } from '@/types/chat';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIStream } from '@/utils/server';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 // @ts-expect-error
@@ -8,10 +8,10 @@ import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module
 
 
 export const metadata = {
-    name: 'openai',
-    description: 'this is the model agent of openai'
+    name: 'gpt-3.5-turbo',
+    description: 'this is the model agent of openai gpt3.5-turbo',
+    freeSystemPrompt: true
 }
-
 
 export default async function generate(messages: Message[], prompt='') {
     const model = {
@@ -55,4 +55,3 @@ export default async function generate(messages: Message[], prompt='') {
     const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
     return stream
 }
-

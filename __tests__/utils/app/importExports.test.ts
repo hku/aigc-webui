@@ -1,5 +1,5 @@
 import { ExportFormatV1, ExportFormatV2, ExportFormatV4 } from '@/types/export';
-import { OpenAIModels, OpenAIModelID } from '@/types/openai';
+import { AndonModels, AddonModelID } from '@/types/addon';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { it, describe, expect } from 'vitest';
 
@@ -99,7 +99,7 @@ describe('cleanData Functions', () => {
                 content: 'Hi',
               },
             ],
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            model: AndonModels[AddonModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
             folderId: null,
           },
@@ -154,7 +154,7 @@ describe('cleanData Functions', () => {
                 content: 'Hi',
               },
             ],
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            model: AndonModels[AddonModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
             folderId: null,
           },
@@ -189,7 +189,7 @@ describe('cleanData Functions', () => {
                 content: 'Hi',
               },
             ],
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            model: AndonModels[AddonModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
             folderId: null,
           },
@@ -207,7 +207,7 @@ describe('cleanData Functions', () => {
             name: 'prompt 1',
             description: '',
             content: '',
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            model: AndonModels[AddonModelID.GPT_3_5],
             folderId: null,
           },
         ],
@@ -231,7 +231,7 @@ describe('cleanData Functions', () => {
                 content: 'Hi',
               },
             ],
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            model: AndonModels[AddonModelID.GPT_3_5],
             prompt: DEFAULT_SYSTEM_PROMPT,
             folderId: null,
           },
@@ -249,7 +249,7 @@ describe('cleanData Functions', () => {
             name: 'prompt 1',
             description: '',
             content: '',
-            model: OpenAIModels[OpenAIModelID.GPT_3_5],
+            model: AndonModels[AddonModelID.GPT_3_5],
             folderId: null,
           },
         ],

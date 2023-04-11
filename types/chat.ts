@@ -1,4 +1,4 @@
-import { OpenAIModel } from './openai';
+import { AddonModel } from './addon';
 
 export interface Message {
   role: Role;
@@ -8,8 +8,7 @@ export interface Message {
 export type Role = 'assistant' | 'user';
 
 export interface ChatBody {
-  model: OpenAIModel; //TODO: change to string or enum to represent addon keys
-  key: string; //TODO: delete it
+  model: AddonModel; //TODO: change to string or enum to represent addon keys
   messages: Message[];
   prompt: string;
 }
@@ -18,7 +17,7 @@ export interface Conversation {
   id: string;
   name: string;
   messages: Message[];
-  model: OpenAIModel;
+  model: AddonModel;
   prompt: string;
   folderId: string | null;
 }

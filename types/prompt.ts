@@ -1,10 +1,10 @@
-import { OpenAIModel } from './openai';
+import { AddonModel } from './addon';
 
 export interface Prompt {
   id: string;
   name: string;
   description: string;
   content: string;
-  model: OpenAIModel;
+  model: AddonModel;
   folderId: string | null;
 }

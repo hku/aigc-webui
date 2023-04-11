@@ -1,8 +1,7 @@
 import { Conversation, Message } from '@/types/chat';
 import { KeyValuePair } from '@/types/data';
 import { ErrorMessage } from '@/types/error';
-import { OpenAIModel, OpenAIModelID } from '@/types/openai';
-import { Plugin } from '@/types/plugin';
+import { AddonModel, AddonModelID } from '@/types/addon';
 import { Prompt } from '@/types/prompt';
 import { throttle } from '@/utils';
 import { IconArrowDown, IconClearAll, IconSettings } from '@tabler/icons-react';
@@ -26,10 +25,9 @@ import { SystemPrompt } from './SystemPrompt';
 
 interface Props {
   conversation: Conversation;
-  models: OpenAIModel[];
-  apiKey: string;
-  serverSideApiKeyIsSet: boolean;
-  defaultModelId: OpenAIModelID;
+  models: AddonModel[];
+  defaultModelId: AddonModelID;
+  FreeSystemPromptModelIDs: AddonModelID[];
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
   loading: boolean;
@@ -37,7 +35,6 @@ interface Props {
   onSend: (
     message: Message,
     deleteCount: number,
-    plugin: Plugin | null,
   ) => void;
   onUpdateConversation: (
     conversation: Conversation,
@@ -51,9 +48,8 @@ export const Chat: FC<Props> = memo(
   ({
     conversation,
     models,
-    apiKey,
-    serverSideApiKeyIsSet,
     defaultModelId,
+    FreeSystemPromptModelIDs,
     messageIsStreaming,
     modelError,
     loading,
@@ -154,49 +150,6 @@ export const Chat: FC<Props> = memo(
 
     return (
       <div className="relative flex-1 overflow-hidden bg-white dark:bg-[#343541]">
-        {!(apiKey || serverSideApiKeyIsSet) ? (
-          <div className="mx-auto flex h-full w-[300px] flex-col justify-center space-y-6 sm:w-[600px]">
-            <div className="text-center text-4xl font-bold text-black dark:text-white">
-              Welcome to Chatbot UI
-            </div>
-            <div className="text-center text-lg text-black dark:text-white">
-              <div className="mb-8">{`Chatbot UI is an open source clone of OpenAI's ChatGPT UI.`}</div>
-              <div className="mb-2 font-bold">
-                Important: Chatbot UI is 100% unaffiliated with OpenAI.
-              </div>
-            </div>
-            <div className="text-center text-gray-500 dark:text-gray-400">
-              <div className="mb-2">
-                Chatbot UI allows you to plug in your API key to use this UI
-                with their API.
-              </div>
-              <div className="mb-2">
-                It is <span className="italic">only</span> used to communicate
-                with their API.
-              </div>
-              <div className="mb-2">
-                {t(
-                  'Please set your OpenAI API key in the bottom left of the sidebar.',
-                )}
-              </div>
-              <div>
-                {t(
-                  "If you don't have an OpenAI API key, you can get one here: ",
-                )}
-                <a
-                  href="https://platform.openai.com/account/api-keys"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-500 hover:underline"
-                >
-                  openai.com
-                </a>
-              </div>
-            </div>
-          </div>
-        ) : modelError ? (
-          <ErrorMessageDiv error={modelError} />
-        ) : (
           <>
             <div
               className="max-h-full overflow-x-hidden"
@@ -212,7 +165,7 @@ export const Chat: FC<Props> = memo(
                           <Spinner size="16px" className="mx-auto" />
                         </div>
                       ) : (
-                        'Chatbot UI'
+                        'AIGC-webui'
                       )}
                     </div>
 
@@ -230,7 +183,7 @@ export const Chat: FC<Props> = memo(
                           }
                         />
 
-                        <SystemPrompt
+                        {FreeSystemPromptModelIDs.includes(conversation.model.id)? <SystemPrompt
                           conversation={conversation}
                           prompts={prompts}
                           onChangePrompt={(prompt) =>
@@ -239,7 +192,7 @@ export const Chat: FC<Props> = memo(
                               value: prompt,
                             })
                           }
-                        />
+                        />: <></>}
                       </div>
                     )}
                   </div>
@@ -305,18 +258,17 @@ export const Chat: FC<Props> = memo(
               conversationIsEmpty={conversation.messages.length === 0}
               model={conversation.model}
               prompts={prompts}
-              onSend={(message, plugin) => {
+              onSend={(message) => {
                 setCurrentMessage(message);
-                onSend(message, 0, plugin);
+                onSend(message, 0);
               }}
               onRegenerate={() => {
                 if (currentMessage) {
-                  onSend(currentMessage, 2, null);
+                  onSend(currentMessage, 2);
                 }
               }}
             />
           </>
-        )}
         {showScrollDownButton && (
           <div className="absolute bottom-0 right-0 mb-4 mr-4 pb-20">
             <button
