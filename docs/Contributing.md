@@ -62,13 +62,7 @@ Users can access your addin in the prefix of the input box here:
 
 the folder trees now looks like:
 
-aigc-webui
-  │ 
-  ├── addins  
-  ├── addons
-  │   ├── YOUR_COOL_ADDON
-  │   │       ├── model.ts
-  │   └── ...
+![addons](./images/addons.jpg)
 
 (2)  **`model.ts`** exports an object called `metadata` and a `default` function:
 
@@ -114,13 +108,7 @@ interface Message {
 
 the folder trees now looks like:
 
-aigc-webui
-  │ 
-  ├── addins
-  │   ├── YOUR_COOL_ADDIN
-  │   │       ├── index.ts
-  │   └── ...
-  ├── addons
+![addins](./images/addins.jpg)
 
 
 (2)  **`index.ts`** exports an object called `metadata` and a function called `after_input`:

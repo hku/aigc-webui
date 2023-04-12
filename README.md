@@ -1,57 +1,65 @@
 # AIGC-webui
 
-[en](./README.md)  [中文](./README_cn.md) 
+[en](./README.md) | [中文](./README_cn.md) 
 
-这是一个用于AI创作的通用（extendable）浏览器操作界面。 例如：你可以通过它定制chatGPT的使用方式，也可以用来创作绘画和音乐...
+AIGC-webui is a universal interface for AIGC (AI Generated Content). For example, you can use it to make chatGPT working more creatively, or to generate images / musics.
 
-![screenshot](screenshot.jpg)
+Screenshot:
+![screenshot](./docs/images/screenshoot.jpg)
 
 ### Features
  
-- 强化ChatGPT，使ChatGPT可以绘画、作曲
-- 可切换的AI创作模型，例如ChatGPT，LLaMA，Stable Diffusion，Riffusion
-- 多模态的输出，如image，audio，codeblock等
-- 可切换的提示词优化器，例如自动翻译，自动优化提示词（生成图画用）
-- 可扩展、易开发的模型代理 （[开发教程](doc/tutorial.md)）
-- 可扩展、易开发的提示词预处理器（[开发教程](doc/tutorial.md)）
-- 可定制的预置提示词
+- A variety of AIGC models to choose from, such as ChatGPT, LLaMA, Stable Diffusion，Riffusion
+- Multimodal generation ability, such as images, musics, code blocks, and so on.
+- Comes with an addon, named `gpt3-5-enhanced`, that enrich ChatGPT with the ability to generate images and musics.
+- Comes with an addin, named `translate`, that can translates user input automatically, and another plugin `beautify` than can optimize user's prompt for image generation.
+- An extendable infrastructure, easy to make your own extension. （[Guidelines](docs/Contributing.md)）
+- predefined prompt shortcuts ...
 - etc.
 
-## 快速安装
+## Installation and Running
 
-### Windows 系统
-1. 安装 [nodejs](https://nodejs.org) 
-2. 安装 [git](https://git-scm.com/download/win).
-3. 下载软件包，打开window命令行（windows + R 输入cmd后回车），执行：`git clone https://github.com/hku/aigc-webui.git`
-4. 安装软件，进入刚下载的文件夹（`cd aigc-webui`），执行： `npm install`
-5. 配置环境变量，拷贝软件包中的`.env.local.example`文件，将这个新文件命名为`.env.local`并放在当前文件夹，根据你需要使用的模型服务，在`.env.local`填入相应的密钥, 密钥申请方式，详见教程：[doc/tutorial.md](doc/tutorial.md)
+### For Windows User
+1. Install [nodejs](https://nodejs.org) 
+2. Install [git](https://git-scm.com/download/win).
+3. Download this project: open the terminal (Windows + R, type "cmd" and press Enter), and execute `git clone https://github.com/hku/aigc-webui.git`
+4. Install dependencies: Navigate into the project folder(`cd aigc-webui`), and execute `npm install`
+5. Customize the environment:  make a copy of the example environment variables file `.env.local.example`, name it `.env.local`, Fill in the keys or tokens in the `.env.local` file. The meanings of the keys and the application links for them  are listed in the table below.
 
-6. 运行webui服务，打开浏览器界面
-```
-npm run dev
-```
-根据提示，在浏览器打开地址 [http://localhost:3000/zh](http://localhost:3000/zh)，即可使用
+| environment variables         |  Free application links                | Usage                                            |
+| --------------------- | ------------------------------ | ------------------------------------------------------- |
+| OPENAI_API_KEY        |   [openai](https://platform.openai.com/account/api-keys)     |For calling OpenAI's official API, required for the model `GPT-3.5` and `GPT-3.5-enhanced` shipped with this repository. |
+| REPLICATE_API_TOKEN    | [replicate](https://replicate.com)       | For calling replicate APIs，required for  `gpt3-5-enhanced`,`replicate-*` models |
+| BAIDU_TRANSLATE_APPID, BAIDU_TRANSLATE_SECRET  | [Baidu Translate](http://api.fanyi.baidu.com/product/11)  | For calling Baidu translation API，required for the prompt modifiers `translate` and `beautify` shipped with this repository           |
 
-### Mac/Linux 系统
-1. 安装 [nodejs](https://nodejs.org) 
-2. 安装 [git](https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git).
-3. 下载软件包，打开命令行，执行：`git clone https://github.com/hku/aigc-webui.git`
-4. 安装软件，进入刚下载的文件夹（`cd aigc-webui`），执行： `npm install`
-5. 配置环境变量，拷贝软件包中的`.env.local.example`文件，将这个新文件命名为`.env.local`并放在当前文件夹，根据你需要使用的模型服务，在`.env.local`填入相应的密钥, 密钥申请方式，详见教程：[doc/tutorial.md](doc/tutorial.md)
 
-6. 运行webui服务，打开浏览器界面
-```
-npm run dev
-```
-根据提示，在浏览器打开地址 [http://localhost:3000/zh](http://localhost:3000/zh)，即可使用
+6. deploy the web service, by execute `npm run dev`
 
-## 插件开发
+Open the address in your browser: [http://localhost:3000](http://localhost:3000), enjoy!
 
-aigc-webui 有一个简单易用的插件系统，你可以根据自己的需求开发自己模型的代理，提示词预处理器等功能，详见 [插件开发](doc/tutorial.md)
+### For Mac/Linux User
+1. Install [nodejs](https://nodejs.org) 
+2. Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+3. Download this project: open the terminal, and execute：`git clone https://github.com/hku/aigc-webui.git`
+4. Install dependencies: Navigate into the project folder(`cd aigc-webui`), and execute `npm install`
+5. Customize the environment:  make a copy of the example environment variables file `.env.local.example`, name it `.env.local`, Fill in the keys or tokens in the `.env.local` file. The meanings of the keys and the application links for them  are listed in the table below.
 
-## Contributing
+| environment variables         |  Free application links                | Usage                                            |
+| --------------------- | ------------------------------ | ------------------------------------------------------- |
+| OPENAI_API_KEY        |   [openai](https://platform.openai.com/account/api-keys)     |For calling OpenAI's official API, required for the model `GPT-3.5` and `GPT-3.5-enhanced` shipped with this repository. |
+| REPLICATE_API_TOKEN    | [replicate](https://replicate.com)       | For calling replicate APIs，required for  `gpt3-5-enhanced`,`replicate-*` models |
+| BAIDU_TRANSLATE_APPID, BAIDU_TRANSLATE_SECRET  | [Baidu Translate](http://api.fanyi.baidu.com/product/11)  | For calling Baidu translation API，required for the prompt modifiers `translate` and `beautify` shipped with this repository           |
 
-Here's how to add code to this repo: [Contributing]()
+
+6. deploy the web service, by execute `npm run dev`
+
+Open the address in your browser: [http://localhost:3000](http://localhost:3000), enjoy!
+
+
+## Develop Your Extensions
+
+aigc-webui has a simple and easy-to-use extension infrastructure. You can develop your own agents, prompt modifiers, or other features ，详见 [guidelines](docs/Contributing.md)
+
 
 ## Credits
 - openai - https://github.com/openai/openai-cookbook
@@ -64,4 +72,4 @@ Here's how to add code to this repo: [Contributing]()
 
 ### Contact
 
-If you have any questions, feel free to reach out to me on [Twitter]().
+If you have any questions, feel free to reach out to me on [Facebook](https://www.facebook.com/kun.huang.750).
