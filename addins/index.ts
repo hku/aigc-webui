@@ -41,12 +41,16 @@ class PromptModifier {
     async modify(prompt: string, key: AddinModifierID) {
             const obj = this._object[key]
             if(obj) {
-                return await obj.after_input(prompt) 
+                try {
+                    return await obj.after_input(prompt)
+                } catch(e) {
+                    console.log(e)
+                    return prompt
+                } 
             }
             return prompt
     }
   }
-
 
 const promptModifier =  new PromptModifier({})
 promptModifier.load(addinsManifest)

@@ -14,7 +14,6 @@ import {
   fallbackModelID,
 } from '@/types/addon';
 import { Prompt } from '@/types/prompt';
-import { getEndpoint } from '@/utils/app/api';
 import {
   cleanConversationHistory,
   cleanSelectedConversation,
@@ -42,6 +41,8 @@ import addonsManifest from "../addons-manifest.json"
 import addinsManifest from "../addins-manifest.json"
 
 
+import defaultPrompts from '../config/defaultPrompts.json'
+
 import { AddinModifier, AddinModifierID } from '@/types/addin';
 
 const addonsIds = addonsManifest as string[]
@@ -49,12 +50,14 @@ const addonsIds = addonsManifest as string[]
 interface HomeProps {
   defaultModelId: AddonModelID;
   addinModifiers:  AddinModifier[];
+  addonModels: AddonModel[];
   FreeSystemPromptModelIDs: AddonModelID[]
 }
 
 const Home: React.FC<HomeProps> = ({
   defaultModelId,
   addinModifiers,
+  addonModels,
   FreeSystemPromptModelIDs
 }) => {
   const { t } = useTranslation('chat');
@@ -66,8 +69,6 @@ const Home: React.FC<HomeProps> = ({
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
 
   const [modelError, setModelError] = useState<ErrorMessage | null>(null);
-
-  const [models, setModels] = useState<AddonModel[]>([]);
 
   const [folders, setFolders] = useState<Folder[]>([]);
 
@@ -87,6 +88,29 @@ const Home: React.FC<HomeProps> = ({
 
   // FETCH RESPONSE ----------------------------------------------
 
+  const modifyUserPrompt = async (message: Message, addinId: AddinModifierID | null) => {
+    if (message.role !== 'user') {return message}
+    if (!addinId) {return message}
+    let _content = message.content.trim()
+    if (!_content) {return message}
+
+    const res  = await fetch('/api/modify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: _content,
+        addinId: addinId
+      }),
+    })
+
+    const result = (await res.json()).result
+    message.content = result
+    console.log(`message.conent: ${result}`)
+    return message
+  }
+
   const handleSend = async (
     message: Message,
     deleteCount = 0,
@@ -95,27 +119,24 @@ const Home: React.FC<HomeProps> = ({
     if (selectedConversation) {
       let updatedConversation: Conversation;
 
-      if (deleteCount) {
-        const updatedMessages = [...selectedConversation.messages];
-        for (let i = 0; i < deleteCount; i++) {
-          updatedMessages.pop();
-        }
 
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...updatedMessages, message],
-        };
-      } else {
-        updatedConversation = {
-          ...selectedConversation,
-          messages: [...selectedConversation.messages, message],
-        };
-      }
+      const updatedMessages = [...selectedConversation.messages];
+
+      if (deleteCount>0) {
+        updatedMessages.splice(-deleteCount)
+      } 
+
+      await modifyUserPrompt(message, addinId)
+
+      updatedConversation = {
+        ...selectedConversation,
+        messages: [...updatedMessages, message],
+      };
 
       setSelectedConversation(updatedConversation);
       setLoading(true);
       setMessageIsStreaming(true);
-
+      
       const chatBody: ChatBody = {
         model: updatedConversation.model,
         messages: updatedConversation.messages,
@@ -123,14 +144,14 @@ const Home: React.FC<HomeProps> = ({
         addinId
       };
 
-      const endpoint = getEndpoint();
+
       let body;
 
       body = JSON.stringify(chatBody);
   
 
       const controller = new AbortController();
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,46 +272,6 @@ const Home: React.FC<HomeProps> = ({
 
   // FETCH MODELS ----------------------------------------------
 
-  const fetchModels = async () => {
-    const error = {
-      title: t('Error fetching models.'),
-      code: null,
-      messageLines: [
-        t(
-          'an error when fetch models',
-        ),
-      ],
-    } as ErrorMessage;
-
-    const response = await fetch('/api/addons', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      try {
-        const data = await response.json();
-        Object.assign(error, {
-          code: data.error?.code,
-          messageLines: [data.error?.message],
-        });
-      } catch (e) {}
-      setModelError(error);
-      return;
-    }
-
-    const data = await response.json();
-
-    if (!data) {
-      setModelError(error);
-      return;
-    }
-
-    setModels(data);
-    setModelError(null);
-  };
 
   // BASIC HANDLERS --------------------------------------------
 
@@ -562,9 +543,6 @@ const Home: React.FC<HomeProps> = ({
     }
   }, [selectedConversation]);
 
-  useEffect(() => {
-      fetchModels();
-  }, []);
 
   // ON LOAD --------------------------------------------
 
@@ -595,10 +573,18 @@ const Home: React.FC<HomeProps> = ({
       setFolders(JSON.parse(folders));
     }
 
-    const prompts = localStorage.getItem('prompts');
-    if (prompts) {
-      setPrompts(JSON.parse(prompts));
-    }
+    const _prompts = localStorage.getItem('prompts');
+    
+    const prompts: Prompt[]  = _prompts?JSON.parse(_prompts):[]
+    const promptIds = prompts.map(p=>p.id)
+    
+    defaultPrompts.forEach(d=> {
+      if(!promptIds.includes(d.id)) {
+        prompts.push(d)
+      }
+    })
+  
+    setPrompts(prompts);
 
     const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {
@@ -704,7 +690,7 @@ const Home: React.FC<HomeProps> = ({
                 addinModifiers = {addinModifiers}
                 FreeSystemPromptModelIDs={FreeSystemPromptModelIDs}
                 modelError={modelError}
-                models={models}
+                models={addonModels}
                 loading={loading}
                 prompts={prompts}
                 onSend={handleSend}
@@ -754,6 +740,7 @@ const Home: React.FC<HomeProps> = ({
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+
   const defaultModelId =
     (process.env.DEFAULT_MODEL &&
       addonsIds.includes(
@@ -762,22 +749,24 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       process.env.DEFAULT_MODEL) ||
     fallbackModelID;
 
-    
-    const FreeSystemPromptModelIDs: AddonModelID[] = []
-    for (const name of addonsIds) {
-      const scriptModule = await import(`../addons/${name}/model.ts`);
-      const metadata = scriptModule.metadata
-      if(metadata?.freeSystemPrompt) {
-        FreeSystemPromptModelIDs.push(name)
-      }
-    }
   
   const addinModifiers: AddinModifier[] = []
   
-  for (const name of addinsManifest) {
-    const scriptModule = await import(`../addins/${name}`);
-    const metadata = scriptModule.metadata
-      addinModifiers.push({id: name, ...metadata})
+  for (const k of addinsManifest as string[]) {
+    const scriptModule = await import(`../addins/${k}`);
+    const metadata = scriptModule.metadata || {name: 'unknown', description: "unknown"}
+      addinModifiers.push({id: k, ...metadata  })
+  }
+
+  const addonModels: AddonModel[] = []
+  const FreeSystemPromptModelIDs: AddonModelID[] = []
+  for (const k of addonsManifest as string[]) {
+    const scriptModule = await import(`../addons/${k}/model.ts`);
+    const metadata = scriptModule.metadata || {name: 'unknown', description: "unknown"}
+    if(metadata?.freeSystemPrompt) {
+      FreeSystemPromptModelIDs.push(k)
+    }
+    addonModels.push({id: k, ...metadata})
   }
   
   return {
@@ -785,6 +774,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       defaultModelId,
       FreeSystemPromptModelIDs,
       addinModifiers,
+      addonModels,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',
         'chat',

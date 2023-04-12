@@ -90,8 +90,10 @@ export default async function generate(messages: Message[], prompt='') {
 
       try {
         const res = JSON.parse(cleanedText as string)
-        
-        const inputPrompt = res.input.trim()
+        let inputPrompt = res.input
+        inputPrompt = (typeof inputPrompt) === 'object'?JSON.stringify(inputPrompt):(inputPrompt as string)
+        inputPrompt = inputPrompt.trim()
+        // const inputPrompt = (res.input as string).trim()
 
         if(inputPrompt) {
           switch (task) {
@@ -172,7 +174,7 @@ function matchIntent(txt: string) {
   
   const regs: {[key: string]: any} = {
     "txt2img": /(\{[\w\W]*txt2img[\w\W]*\})/,
-    "txt2music": /(\{[\w\W]*txt2music[\w\W]*\})/,
+    "txt2music": /(\{[\w\W]*(txt2music|txt2song)[\w\W]*\})/,
   }
   
   for (const task in regs) {

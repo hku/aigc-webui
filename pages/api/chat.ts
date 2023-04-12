@@ -2,13 +2,12 @@ import { ChatBody, Message } from '@/types/chat';
 
 import promptModifier from '../../addins';
 
-import modelAgent  from '../../addons'
+import modelAgent  from '../../addons';
 
 export const config = {
   runtime: 'edge',
 };
 
-// const handler =  async (  req: NextApiRequest, res: NextApiResponse) => {
 const handler = async (req: Request): Promise<Response> => {
   try {
     
@@ -24,23 +23,8 @@ const handler = async (req: Request): Promise<Response> => {
       //# a simple prompt trick to make chatgpt respond with json data if possible.
       const hasFlag = /(!!!|！！！)$/.test(lastContent)
 
-      let _content = lastContent
       if(hasFlag) {
-        _content = _content.replace(/(!|！)+$/, '')        
-      }
-      if(addinId) {
-        _content = await promptModifier.modify(_content, addinId)
-      } 
-
-      if(hasFlag) {
-        _content = `${_content}!!!`
-      }
-
-      console.log(`_conent: ${_content}`)
-
-      if(hasFlag) {
-        messages.slice(-1)[0].content = _content.replace(/(!|！)+$/, ', please respond using json format')
-        console.log(`last message content: ${messages.slice(-1)[0].content}`)
+        messages.slice(-1)[0].content = lastContent.replace(/(!|！)+$/, ', please respond using json format')
       }
 
     }

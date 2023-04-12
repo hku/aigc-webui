@@ -15,6 +15,13 @@ const nextConfig = {
       layers: true,
     };
 
+    config.module.rules.push({
+      test: /\.ya?ml$/,
+      type: 'json',
+      use: 'yaml-loader',
+    });
+    
+
     if(isServer) {
       try {  
         const addinsPath = path.join(__dirname, 'addins');

@@ -1,0 +1,8 @@
+[
+  {
+    "id": "123",
+    "name": "paper summary",
+    "description":  "a system prompt for summarizing papers",
+    "content": "TLDR: "
+  }
+]

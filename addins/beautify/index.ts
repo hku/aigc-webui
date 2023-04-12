@@ -1,14 +1,17 @@
+import Replicate from "replicate";
+
 const baidu_trans_url = 'http://api.fanyi.baidu.com/api/trans/vip/translate';
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN || '',
+});
 
 import md5 from "md5"
 
 export const metadata = {
-    name: 'translator',
-    description: `
-This modifier use Baidu Fanyi API translates the prompt into English automatically.
-To use this modifier, you need to customize your BAIDU_TRANSLATE_APPID and BAIDU_TRANSLATE_SECKRET
-`,
-    icon: 'IconLanguage'
+    name: 'beautifier',
+    description: 'translate and modify prompt more suitable for generating beautiful images',
+    icon: 'IconPalette'
 }
 
 export const after_input = async (prompt: string) => {
@@ -39,7 +42,17 @@ export const after_input = async (prompt: string) => {
 
     console.log(`translated: ${result_text}`)
 
-    return result_text
+
+    const output = await replicate.run(
+        "kyrick/prompt-parrot:7349c6ce7eb83fc9bc2e98e505a55ee28d7a8f4aa5fb6f711fad18724b4f2389",
+        {
+          input: {
+            prompt: result_text + ' '
+          }
+        }
+      );
+    
+    return (output as unknown as string).split(/\-+/)[0]
 
 }
 

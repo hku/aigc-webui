@@ -48,7 +48,6 @@ class ModelAgent {
             const scriptModule = await import(`../addons/${name}/model.ts`);
             addons[name] = scriptModule;
           }
-          console.log(addons)
           this._reset(addons)
           cb()
     }
@@ -56,7 +55,11 @@ class ModelAgent {
     async generate(messages: Message[], prompt: string, key = 'gpt3-5') {
         this.active = key;
         const obj = this._object[this.active]
-        return await obj.default(messages, prompt)
+        try {
+            return await obj.default(messages, prompt)
+        } catch(e) {
+            return `error: ${e as string}`
+        }
     }
   }
 

@@ -19,7 +19,7 @@ export const AddinSelect: FC<Props> = ({
 }) => {
 
   const { t } = useTranslation('chat');
-  const [desc, setDesc] = useState<string| null>(null)
+//   const [desc, setDesc] = useState<string| null>(null)
   const selectRef = useRef<HTMLSelectElement>(null);
 
 //   const handleKeyDown = (e: React.KeyboardEvent<HTMLSelectElement>) => {
@@ -63,11 +63,11 @@ export const AddinSelect: FC<Props> = ({
     }
   }, []);
 
-  useEffect(()=>{
-    const theAddin = addinModifiers.find(a => a.id === addinId)
-    const desc = theAddin?.description || null
-    setDesc(desc)
-  }, [addinModifiers, addinId])
+//   useEffect(()=>{
+//     const theAddin = addinModifiers.find(a => a.id === addinId)
+//     const desc = theAddin?.description || null
+//     setDesc(desc)
+//   }, [addinModifiers, addinId])
 
   return (
     <div className="flex flex-col">
@@ -99,13 +99,13 @@ export const AddinSelect: FC<Props> = ({
             </option>
           ))}
         </select>
-
+{/* 
         {desc?<div style={{
             minWidth: '300px',
             marginTop: '-50px'
         }} className="absolute top-0 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
             {desc}
-        </div>:<></>}
+        </div>:<></>} */}
       </div>
     </div>
   );

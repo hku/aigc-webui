@@ -24,7 +24,7 @@ import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import { AddinModifier, AddinModifierID } from '@/types/addin';
 import { AddinSelect } from './AddinSelect';
-import ICONS_DICT from '../icons';
+import ICONS_DICT from '../../config/icons';
 
 
 interface Props {
@@ -245,7 +245,7 @@ export const ChatInput: FC<Props> = ({
     };
   }, []);
 
-  const getPromptIcon = (addinId: AddinModifierID | null) => {
+  const getAddinIcon = (addinId: AddinModifierID | null) => {
     if(addinId) {
 
       const theAddin = addinModifiers.find(a=>a.id===addinId)
@@ -256,6 +256,13 @@ export const ChatInput: FC<Props> = ({
     }
     return ICONS_DICT["IconPrompt"] || <IconPrompt size={20} />
   }
+
+  const getAddinDesc = (addinId: AddinModifierID | null) => {
+    const theAddin = addinModifiers.find(a => a.id === addinId)
+    const desc = theAddin?.description || "no description available"
+    return desc
+  } 
+
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
@@ -279,13 +286,21 @@ export const ChatInput: FC<Props> = ({
         )}
 
         <div className="relative mx-2 flex w-full flex-grow flex-col rounded-md border border-black/10 bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-gray-900/50 dark:bg-[#40414F] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)] sm:mx-4">
+        <div className="relative group">
           <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => serShowAddinSelect(!showAddinSelect)}
             onKeyDown={(e) => {}}
           >
-            {getPromptIcon(addinId)}
+            {getAddinIcon(addinId)}
           </button>
+
+          <div className="absolute top-0 -mt-10 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
+                {getAddinDesc(addinId)}
+            </div>
+        </div>
+
+
 
           {showAddinSelect && (
             <div className="absolute left-0 bottom-14 rounded bg-white dark:bg-[#343541]">

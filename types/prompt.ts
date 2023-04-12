@@ -5,6 +5,6 @@ export interface Prompt {
   name: string;
   description: string;
   content: string;
-  model: AddonModel;
-  folderId: string | null;
+  model?: AddonModel | null;
+  folderId?: string | null;
 }
