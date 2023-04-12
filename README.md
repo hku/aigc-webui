@@ -5,6 +5,7 @@
 AIGC-webui is a universal interface for AIGC (AI Generated Content). For example, you can use it to make chatGPT working more creatively, or to generate images / musics.
 
 Screenshot:
+
 ![screenshot](./docs/images/screenshoot.jpg)
 
 ### Features
@@ -58,7 +59,7 @@ Open the address in your browser: [http://localhost:3000](http://localhost:3000)
 
 ## Develop Your Extensions
 
-aigc-webui has a simple and easy-to-use extension infrastructure. You can develop your own agents, prompt modifiers, or other features ，详见 [guidelines](docs/Contributing.md)
+aigc-webui has a simple and easy-to-use extension infrastructure. You can develop your own agents, prompt modifiers, or other features ，Check [guidelines](docs/Contributing.md)
 
 
 ## Credits
