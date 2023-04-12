@@ -1,21 +1,20 @@
 # AIGC-webui
 
-[en](./README.md)  [中文](./README_cn.md) 
+[英文](./README.md)  [中文](./README_cn.md) 
 
 这是一个用于AI创作的通用（extendable）浏览器操作界面。 例如：你可以通过它定制chatGPT的使用方式，也可以用来创作绘画和音乐...
 
 ![screenshot](screenshot.jpg)
 
-### Features
+## 功能特点
  
 - 强化ChatGPT，使ChatGPT可以绘画、作曲
 - 可切换的AI创作模型，例如ChatGPT，LLaMA，Stable Diffusion，Riffusion
-- 多模态的输出，如image，audio，codeblock等
 - 可切换的提示词优化器，例如自动翻译，自动优化提示词（生成图画用）
-- 可扩展、易开发的模型代理 （[开发教程](doc/tutorial.md)）
-- 可扩展、易开发的提示词预处理器（[开发教程](doc/tutorial.md)）
+- 可扩展的模型代理 （[开发教程](./Contribe.md)）
+- 可扩展的提示词优化器（[开发教程](./Contribe.md)）
 - 可定制的预置提示词
-- etc.
+- 其他
 
 ## 快速安装
 
@@ -47,21 +46,10 @@ npm run dev
 
 ## 插件开发
 
-aigc-webui 有一个简单易用的插件系统，你可以根据自己的需求开发自己模型的代理，提示词预处理器等功能，详见 [插件开发](doc/tutorial.md)
+aigc-webui 有一个简单易用的插件系统，你可以根据自己的需求开发自己模型代理，提示词预处理器等功能，详见 [插件开发](doc/tutorial.md)
 
-## Contributing
+## 贡献
 
-Here's how to add code to this repo: [Contributing]()
 
-## Credits
-- openai - https://github.com/openai/openai-cookbook
-- Chatbot UI - https://github.com/mckaywrigley/chatbot-ui
-- Nextjs - https://github.com/vercel/next.js
-- Replicate - https://github.com/replicate/replicate-javascript
-- Stable Diffusion - https://github.com/CompVis/stable-diffusion
-- LlaMA - https://github.com/facebookresearch/llama
-- (You)
 
-### Contact
 
-If you have any questions, feel free to reach out to me on [Twitter]().
