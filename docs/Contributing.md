@@ -53,7 +53,7 @@ Users can access your addin in the prefix of the input box here:
 
 ### <a name="addon"></a> Make an `addon`
 
-(1) create a folder in `addons` named saying `YOUR_COOL_ADDON`, and a script name 'model.ts' in `YOUR_COOL_ADDON`, other scripts of your addon should be all placed in `YOUR_COOL_ADDON`.
+(1) create a folder in `addons` named saying `YOUR_COOL_ADDON`, and a script named 'model.ts' in `YOUR_COOL_ADDON`, other scripts of your addon should be all placed in `YOUR_COOL_ADDON`.
 
 the folder trees now looks like:
 
@@ -95,11 +95,11 @@ interface Message {
 
 - `result: string | ReadableStream` defines the answer of the model. If you want a image result, your can return a markdown string like `'![image_name](image_url)'` 
 
-(3) `YOUR_COOL_ADDON` will be automatically loaded by the webui when deployed. Full examples can be found in  `addons/gpt3-5` or `addons/gpt3-5-enhanced`. 
+(3) `YOUR_COOL_ADDON` will be automatically loaded by the webui when deployed. Full examples can be found in the folder `addons`, such as `addons/gpt3-5` or `addons/gpt3-5-enhanced`. 
 
 ### <a name="addin"></a> Make an `addin`
 
-(1) create a folder in `addins` named saying `YOUR_COOL_ADDIN`, and a script name 'index.ts' in `YOUR_COOL_ADDIN`, other scripts of your addin should be all placed in `YOUR_COOL_ADDIN`.
+(1) create a folder in `addins` named saying `YOUR_COOL_ADDIN`, and a script named 'index.ts' in `YOUR_COOL_ADDIN`, other scripts of your addin should be all placed in `YOUR_COOL_ADDIN`.
 
 the folder trees now looks like:
 
