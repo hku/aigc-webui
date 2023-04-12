@@ -5,6 +5,7 @@
 这是一个用于AI创作的通用浏览器操作界面。 例如：你可以通过它定制chatGPT的使用方式，也可以用来创作绘画和音乐...
 
 应用截图：
+
 ![screenshot](./docs/images/screenshoot.jpg)
 
 ### 软件功能
