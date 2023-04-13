@@ -47,11 +47,13 @@ export default async function generate(messages: Message[], prompt='') {
       if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
         break;
       }
+
       tokenCount += tokens.length;
       messagesToSend = [message, ...messagesToSend];
     }
 
+    
     encoding.free();
-    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
-    return stream
+    const stream: ReadableStream | string = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    return stream 
 }
