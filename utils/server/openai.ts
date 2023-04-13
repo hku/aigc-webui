@@ -60,7 +60,7 @@ export const OpenAIStream = async (
     });
   } catch (e) {
     console.log(e)
-    return "failed to call the openai API, check your network"
+    return '<span style="color: red">failed to call the openai API, check your network</span>'
   }
 
   const encoder = new TextEncoder();

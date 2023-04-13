@@ -22,7 +22,7 @@ Screenshot:
 
 ### For Windows User
 
-You can **automatically install** this project  by simply double-clicking the `webui.bat` after downloading this project, or you may choose to install it manually by yourself:
+You can **automatically install** and run this project  by simply double-clicking the `webui.bat` after downloading this project, or you may choose to install it manually by yourself:
 
 1. Install [nodejs](https://nodejs.org) 
 2. Install [git](https://git-scm.com/download/win).
@@ -41,8 +41,9 @@ You can **automatically install** this project  by simply double-clicking the `w
 
 Open the address in your browser: [http://localhost:3000](http://localhost:3000), enjoy!
 
-### For Mac/Linux User
+### For Mac User
 
+You can **automatically install** and run this project by excuting `sh webui_for_mac.sh`  after downloading this project, or you may choose to install it manually by yourself:
 
 
 1. Install [nodejs](https://nodejs.org) 

@@ -44,7 +44,10 @@ npm run dev
 ```
 根据提示，在浏览器打开地址 [http://localhost:3000/zh](http://localhost:3000/zh)，即可使用
 
-### Mac/Linux 系统
+### Mac 系统
+
+你可以通过在命令行执行 `sh webui_for_mac.sh` **自动安装**和运行程序，你也可以选择自己手动安装：
+
 1. 安装 [nodejs](https://nodejs.org) 
 2. 安装 [git](https://git-scm.com/book/zh/v2/%E8%B5%B7%E6%AD%A5-%E5%AE%89%E8%A3%85-Git).
 3. 下载软件包，打开命令行，执行：`git clone https://github.com/hku/aigc-webui.git`
