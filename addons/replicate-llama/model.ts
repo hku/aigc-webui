@@ -1,9 +1,6 @@
-import Replicate from "replicate";
 import { Message } from '@/types/chat';
+import { ReplicateClient, ReplicateNoTokenError } from "@/utils/server/replicate";
 
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN || '',
-});
 
 export const metadata = {
     name: 'replicate-llama-7b',
@@ -16,23 +13,30 @@ export default async function generate(messages: Message[], prompt='') {
 
   const txt = messages.filter(m => m.role === 'user' ).pop()?.content || "Simply put, the theory of relativity states that"
 
-  const output = await replicate.run(
-    "replicate/llama-7b:455d66312a66299fba685548fe24f66880f093007b927abd19f4356295f8577c",
-    {
-      input: {
-        prompt: txt,
-        max_length: 500,
-        temperature: 0.75,
-        top_p: 1,
-        repetition_penalty: 1,
-      }
+  const client =new ReplicateClient(
+    process.env.REPLICATE_API_TOKEN || '',
+    "replicate/llama-7b:455d66312a66299fba685548fe24f66880f093007b927abd19f4356295f8577c"
+  )
+
+  try{
+    const output = await client.generate({
+      prompt: txt,
+      max_length: 500,
+      temperature: 0.75,
+      top_p: 1,
+      repetition_penalty: 1,
+    }) as string[];
+
+    const result = output.join('')
+    
+    return result
+
+  } catch(e) {
+    if(e instanceof ReplicateNoTokenError) {
+      return `<span style="color:red">${e.message}</span>`
     }
-  ) as string[];
-
-
-  const result = output.join('')
-  
-  return result
+    return '<span style="color:red">unknown error when call for the replicate api</span>'
+  }
 
 }
 

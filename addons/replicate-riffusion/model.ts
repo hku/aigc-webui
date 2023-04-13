@@ -1,5 +1,6 @@
 import Replicate from "replicate";
 import { Message } from '@/types/chat';
+import { ReplicateClient, ReplicateNoTokenError } from "@/utils/server/replicate";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN || '',
@@ -15,19 +16,19 @@ The favorable language for this model is English.
 
 export default async function generate(messages: Message[], prompt='') {
 
-
   const txt = messages.filter(m => m.role === 'user' ).pop()?.content || "funky synth solo"
 
-  const output = await replicate.run(
+  const client =new ReplicateClient(
+    process.env.REPLICATE_API_TOKEN || '',
     "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05",
-    {
-      input: {
-        prompt_a: txt
-      }
-    }
-  ) as {[key: string]: any};
-
-  const {audio, spectrogram} = output
+  )
+  
+  try{
+    const output = await client.generate({
+      prompt_a: txt
+    }) as {[key: string]: any};
+  
+    const {audio, spectrogram} = output
   
   return `
   <div>
@@ -38,7 +39,11 @@ export default async function generate(messages: Message[], prompt='') {
   <div>
     <img src=${spectrogram} alt="spectrogram"/>
   </div>
-  `
+  `  
+  } catch(e) {
+    if(e instanceof ReplicateNoTokenError) {
+      return `<span style="color:red">e.message</span>`
+    }
+    return '<span style="color:red">unknown error when call for the replicate api</span>'
+  }
 }
-
-

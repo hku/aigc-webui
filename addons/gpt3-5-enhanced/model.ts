@@ -7,6 +7,7 @@ import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
 import { match } from 'assert';
+import { ReplicateClient, ReplicateNoTokenError } from '@/utils/server/replicate';
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN || '',
@@ -98,32 +99,43 @@ export default async function generate(messages: Message[], prompt='') {
         if(inputPrompt) {
           switch (task) {
             case 'txt2img':
-              const out_img = await replicate.run(
+
+              const client =new ReplicateClient(
+                process.env.REPLICATE_API_TOKEN || '',
                 "cjwbw/anything-v3-better-vae:09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65",
                 // "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
-                {
-                  input: {
-                    prompt: inputPrompt,
-                    negative_prompt: 'lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name'
-                  }
+              )
+            
+              try{
+                const out_img = await client.generate({
+                  prompt: inputPrompt,
+                  negative_prompt: 'lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, artist name'
+                }) as string[];
+            
+                const uri = out_img[0]      
+                return `![result](${uri})`
+            
+              } catch(e) {
+                if(e instanceof ReplicateNoTokenError) {
+                  return `<span style="color:red">${e.message}</span>`
                 }
-              ) as string[];
-              
-              const uri = out_img[0]      
-              return `![result](${uri})`
-          
+                return '<span style="color:red">unknown error when call for the replicate api</span>'
+              }
+                      
             case 'txt2music':
-              const out_mus = await replicate.run(
-                "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05",
-                {
-                  input: {
-                    prompt_a: inputPrompt
-                  }
-                }
-              ) as {[key: string]: any};
+
+            const client2 =new ReplicateClient(
+              process.env.REPLICATE_API_TOKEN || '',
+              "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05",
+            )
+            
+            try{
+              const out_mus = await client2.generate({
+                prompt_a: inputPrompt
+              }) as {[key: string]: any};
             
               const {audio, spectrogram} = out_mus
-              
+            
   return `
   <div>
     <audio controls="controls">
@@ -133,7 +145,13 @@ export default async function generate(messages: Message[], prompt='') {
   <div>
     <img src=${spectrogram} alt="spectrogram"/>
   </div>
-  `
+  `  
+            } catch(e) {
+              if(e instanceof ReplicateNoTokenError) {
+                return `<span style="color:red">${e.message}</span>`
+              }
+              return '<span style="color:red">unknown error when call for the replicate api</span>'
+            }
             default:
               return txt
           }
@@ -141,7 +159,6 @@ export default async function generate(messages: Message[], prompt='') {
         } else {
           return txt
         }
-
 
       } catch (error) {
         return txt
@@ -155,7 +172,7 @@ async function parseStream(stream: string | ReadableStream): Promise<string> {
   if(typeof stream === 'string') {
     return stream
   }
-  
+
   const decoder = new TextDecoder();
   const reader = stream.getReader();
   let text = '';

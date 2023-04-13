@@ -30,7 +30,7 @@ export const OpenAIStream = async (
 
   key = key.trim()
   if (key === '' || key === 'YOUR_KEY') {
-    return "To use this model, you need to apply an openai API_KEY, and fill in the API_KEY into the '.env.local' file. For details, please refer to the README.md file"
+    return `<span style="color:red">To use this model, you need to apply for an openai API_KEY, and fill in the API_KEY into the '.env.local' file. For details, please refer to the <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a> file</span>`
   }
 
   let res: {[key: string]: any}
