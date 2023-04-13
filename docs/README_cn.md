@@ -1,6 +1,6 @@
 # AIGC-webui
 
-[en](../README.md) | [中文](./README_cn.md) | [हिंदी](./README_in.md) | 
+[en](../README.md) | [中文](./README_cn.md) | [हिंदी](./README_in.md) | [español](./README_es.md) | [العربية](./README_ar.md) | [português](./README_po.md) | [日本語](./README_jp.md)
 
 这是一个用于AI创作的通用浏览器操作界面。 例如：你可以通过它定制chatGPT的使用方式，也可以用来创作绘画和音乐...
 
