@@ -24,7 +24,6 @@ IF NOT EXIST .env.local (
 
 echo Starting AIGC-webui...
 echo After the server started, open the link http://localhost:3000
-echo You need to customize your own tokens in '.env.local'
 call npm run dev
 
 
