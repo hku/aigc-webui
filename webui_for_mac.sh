@@ -9,7 +9,7 @@ if ! command -v node &> /dev/null; then
     echo "Homebrew not found. Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
-  
+  brew update
   brew install node
   echo "Node.js installed successfully."
 else

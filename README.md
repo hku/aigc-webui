@@ -1,6 +1,6 @@
 # AIGC-webui
 
-[en](./README.md) | [中文](./README_cn.md) 
+[en](./README.md) | [中文](./docs/README_cn.md) 
 
 AIGC-webui is a universal interface for AIGC (AI Generated Content). For example, you can use it to make chatGPT work the way you like, to generate images / musics.
 
