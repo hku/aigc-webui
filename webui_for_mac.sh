@@ -11,6 +11,9 @@ if ! command -v node &> /dev/null; then
   fi
   brew update
   brew install node
+  brew doctor
+  brew upgrade node
+  brew link --overwrite node
   echo "Node.js installed successfully."
 else
   echo "Node.js is already installed."
