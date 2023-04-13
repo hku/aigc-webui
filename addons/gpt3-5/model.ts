@@ -1,6 +1,6 @@
 import { Message } from '@/types/chat';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { OpenAIStream } from '@/utils/server';
+import { OpenAIStream } from '@/utils/server/openai';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 // @ts-expect-error
@@ -52,7 +52,7 @@ export default async function generate(messages: Message[], prompt='') {
       messagesToSend = [message, ...messagesToSend];
     }
 
-    
+
     encoding.free();
     const stream: ReadableStream | string = await OpenAIStream(model, promptToSend, key, messagesToSend);
     return stream 

@@ -1,7 +1,7 @@
 import { Message } from '@/types/chat';
 import Replicate from "replicate";
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
-import { OpenAIError, OpenAIStream } from '@/utils/server';
+import { OpenAIError, OpenAIStream } from '@/utils/server/openai';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
 // @ts-expect-error
@@ -151,7 +151,11 @@ export default async function generate(messages: Message[], prompt='') {
     }
 }
 
-async function parseStream(stream: ReadableStream): Promise<string> {
+async function parseStream(stream: string | ReadableStream): Promise<string> {
+  if(typeof stream === 'string') {
+    return stream
+  }
+  
   const decoder = new TextDecoder();
   const reader = stream.getReader();
   let text = '';
