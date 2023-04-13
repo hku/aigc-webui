@@ -57,7 +57,7 @@ Open the address in your browser: [http://localhost:3000](http://localhost:3000)
 Open the address in your browser: [http://localhost:3000](http://localhost:3000), enjoy!
 
 
-## Develop Your Owen Extensions
+## Develop Your Own Extensions
 
 aigc-webui has a simple pluggable structure. You can develop your own extensions easily，Check [guidelines](docs/Contributing.md)
 

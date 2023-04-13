@@ -35,7 +35,7 @@ We welcome all kinds of contributions, such as:
 
 To make a standalone extension, please follow the guidelines below. 
 
-## How to make Extensions
+## How to make Your Own Extension
 
 Currently, two types of extensions are supported for AIGC-webui, which are placed in two separate sub-folders, i.e., `addons` and `addins`.
 
@@ -50,6 +50,9 @@ Users can access your addon through a selector located in the header of webui:
 Users can access your addin in the prefix of the input box here:
 
 ![addin](./images/addin.jpg)
+
+
+Currently, you can develop your owen extension in typescript. Python support will come soon!
 
 ### <a name="addon"></a> Make an `addon`
 
