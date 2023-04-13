@@ -6,7 +6,7 @@
 
 应用截图：
 
-![screenshot](./docs/images/screenshoot.jpg)
+![screenshot](./images/screenshoot.jpg)
 
 ### 软件功能
  
