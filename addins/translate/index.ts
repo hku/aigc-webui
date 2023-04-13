@@ -36,11 +36,15 @@ export const after_input = async (prompt: string) => {
     const result = await res.json()
 
     console.log(`res: ${JSON.stringify(result)}`)
-    const result_text = result.trans_result[0].dst
 
-    console.log(`translated: ${result_text}`)
-
-    return result_text
+    try {
+        const result_text = result.trans_result[0].dst
+        console.log(`translated: ${result_text}`)
+        return result_text
+    } catch(e) {
+        console.log(e)
+        return prompt
+    }
 
 }
 

@@ -51,6 +51,10 @@ export const OpenAIStream = async (
     }),
   });
 
+  console.log('----------------')
+  console.log(res)
+  console.log('----------------')
+
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
 
