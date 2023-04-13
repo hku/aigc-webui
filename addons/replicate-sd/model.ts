@@ -6,7 +6,7 @@ const replicate = new Replicate({
 });
 
 export const metadata = {
-    name: 'stable-diffusion-replicate',
+    name: 'replicate-stable-diffusion',
     description: `
 This is a model agent for image generation powered by stable-diffusion api on replicate.
 The favorable language for this model is English.    

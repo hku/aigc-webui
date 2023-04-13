@@ -64,8 +64,6 @@ class ModelAgent {
   }
 
 const modelAgent =  new ModelAgent({})
-modelAgent.loadAddons(addonsManifest, ()=>{
-    modelAgent.active = 'gpt3-5'
-})
+modelAgent.loadAddons(addonsManifest)
 
 export default modelAgent

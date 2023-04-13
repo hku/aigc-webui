@@ -6,8 +6,11 @@ const replicate = new Replicate({
 });
 
 export const metadata = {
-    name: 'riffusion-replicate',
-    description: 'this is the model agent for music generation powered by riffusion api on replicate'
+    name: 'replicate-riffusion',
+    description: `
+    this is the model agent for music generation powered by riffusion api on replicate.
+The favorable language for this model is English.
+`
 }
 
 export default async function generate(messages: Message[], prompt='') {
