@@ -22,6 +22,9 @@
 ## 快速安装
 
 ### Windows 系统
+
+你可以通过双击项目中的 `webui.bat` **自动安装**和运行程序，你也可以自己手动安装：
+
 1. 安装 [nodejs](https://nodejs.org) 
 2. 安装 [git](https://git-scm.com/download/win).
 3. 下载软件包：打开window命令行（windows + R 输入cmd后回车），执行命令 `git clone https://github.com/hku/aigc-webui.git`

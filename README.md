@@ -14,13 +14,16 @@ Screenshot:
 - Multimodal generation ability, such as images, musics, code blocks, and so on.
 - Comes with an addon, named `gpt3-5-enhanced`, that enrich ChatGPT with the ability to generate images and musics.
 - Comes with an addin, named `translate`, that can translates user input automatically, and another plugin `beautify` than can optimize user's prompt for image generation.
-- An extendable infrastructure, easy to make your own extension. （[Guidelines](docs/Contributing.md)）
-- predefined prompt shortcuts ...
+- An extendable framework, easy to make your own extension. （[Guidelines](docs/Contributing.md)）
+- predefined prompt shortcuts
 - etc.
 
 ## Installation and Running
 
 ### For Windows User
+
+You can **automatically install** this project  by simply double-clicking the `webui.bat` after downloading this project, or you may choose to install it manually by yourself:
+
 1. Install [nodejs](https://nodejs.org) 
 2. Install [git](https://git-scm.com/download/win).
 3. Download this project: open the terminal (Windows + R, type "cmd" and press Enter), and execute `git clone https://github.com/hku/aigc-webui.git`
@@ -39,6 +42,9 @@ Screenshot:
 Open the address in your browser: [http://localhost:3000](http://localhost:3000), enjoy!
 
 ### For Mac/Linux User
+
+
+
 1. Install [nodejs](https://nodejs.org) 
 2. Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 3. Download this project: open the terminal, and execute：`git clone https://github.com/hku/aigc-webui.git`
