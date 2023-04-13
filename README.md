@@ -10,7 +10,7 @@ Screenshot:
 
 ### Features
  
-- A variety of AIGC models to choose from, such as ChatGPT, LLaMA, Stable Diffusion，Riffusion
+- A variety of AIGC models to choose from, such as ChatGPT, LLaMA, Stable Diffusion，Riffusion, or some cool models you make by yourself.
 - Multimodal generation ability, such as images, musics, code blocks, and so on.
 - Comes with an addon, named `gpt3-5-enhanced`, that enrich ChatGPT with the ability to generate images and musics.
 - Comes with an addin, named `translate`, that can translates user input automatically, and another plugin `beautify` than can optimize user's prompt for image generation.

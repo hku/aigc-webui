@@ -10,7 +10,7 @@
 
 ### 软件功能
  
-- 可切换的AI创作模型，例如ChatGPT，LLaMA，Stable Diffusion，Riffusion
+- 可切换的AI创作模型，例如 ChatGPT，LLaMA，Stable Diffusion，Riffusion ... 或者你自己制作的AI模型
 - 多模态的输出，如image，audio，codeblock等
 - 自带强化ChatGPT的插件，使ChatGPT可以绘画、作曲
 - 可切换的提示词预处理器，例如自动翻译，自动优化提示词（用户生成图画）
