@@ -104,7 +104,7 @@ interface Message {
 
 ### <a name="addin"></a> Make an `addin`
 
-(All subfolders of 'addons' in this repository are standalone addon-extensions which can be used as templates)
+(All subfolders of 'addins' in this repository are standalone addin-extensions which can be used as templates)
 
 (1) create a folder in `addins` named saying `YOUR_COOL_ADDIN`, and a script named 'index.ts' in `YOUR_COOL_ADDIN`, other scripts of your addin should be all placed in `YOUR_COOL_ADDIN`.
 
