@@ -27,33 +27,41 @@ export const OpenAIStream = async (
   key: string,
   messages: Message[],
 ) => {
-  const res = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-      ...(process.env.OPENAI_ORGANIZATION && {
-        'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-      }),
-    },
-    method: 'POST',
-    body: JSON.stringify({
-      model: model.id,
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        ...messages,
-      ],
-      max_tokens: 1000,
-      temperature: 1,
-      stream: true,
-    }),
-  });
 
-  console.log('----------------')
-  console.log(res)
-  console.log('----------------')
+  key = key.trim()
+  if (key === '' || key === 'YOUR_KEY') {
+    return "To use this model, please apply an openai API_KEY, and fill in the API_KEY into the '.env.local' file, please read the README.md file"
+  }
+
+  let res: {[key: string]: any}
+  try {
+     res = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
+        ...(process.env.OPENAI_ORGANIZATION && {
+          'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
+        }),
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model: model.id,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt,
+          },
+          ...messages,
+        ],
+        max_tokens: 1000,
+        temperature: 1,
+        stream: true,
+      }),
+    });
+  } catch (e) {
+    console.log(e)
+    return "failed to call the openai API, check your network"
+  }
 
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -107,4 +115,6 @@ export const OpenAIStream = async (
   });
 
   return stream;
+
+
 };
