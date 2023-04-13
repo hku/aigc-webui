@@ -14,6 +14,7 @@ export const metadata = {
     icon: 'IconPalette'
 }
 
+//TODO: implement of a `before_input` method
 export const after_input = async (prompt: string) => {
     console.log(`translating: ${prompt}`)
     

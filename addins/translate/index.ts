@@ -11,6 +11,7 @@ To use this modifier, you need to customize your BAIDU_TRANSLATE_APPID and BAIDU
     icon: 'IconLanguage'
 }
 
+//TODO: implement of a `before_input` method
 export const after_input = async (prompt: string) => {
     console.log(`translating: ${prompt}`)
     

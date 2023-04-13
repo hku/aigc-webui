@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-The goal of aigc-webui project is to build an elegant extensible UI client for everyone to make AIGC technologies easily accessible. 
+The goal of aigc-webui project is to build an elegant extendable Web UI for everyone to easily access newest AIGC technologies. 
 
 ## Get Started
 
@@ -137,9 +137,4 @@ export const after_input = async (prompt: string) => {
 
 (3) `YOUR_COOL_ADDIN` will be automatically loaded by the webui when deployed. Full examples can be found in the folder  `addins` of the project. 
 
-
 All exentions are now devolped in typescript, and we plan to support python extensions soon!
-
-
-
-
