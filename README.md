@@ -34,8 +34,7 @@ You can **automatically install** and run this project  by simply double-clickin
 | --------------------- | ------------------------------ | ------------------------------------------------------- |
 | OPENAI_API_KEY        |   <a href="https://platform.openai.com/account/api-keys" target="_blank">openai</a>    |For calling OpenAI's official API, required for the model `GPT-3.5` and `GPT-3.5-enhanced` shipped with this repository. |
 | REPLICATE_API_TOKEN    | <a href="https://replicate.com" target="_blank">replicate</a>  | For calling replicate APIs，required for  `gpt3-5-enhanced`,`replicate-*` models |
-| BAIDU_TRANSLATE_APPID, BAIDU_TRANSLATE_SECRET  | <a href="https://replicate.com" target="_blank">baidu翻译</a>  | For calling Baidu translation API，required for the prompt modifiers `translate` and `beautify` shipped with this repository           |
-
+| BAIDU_TRANSLATE_APPID, BAIDU_TRANSLATE_SECRET  | <a href="http://api.fanyi.baidu.com/product/11" target="_blank">baidu翻译</a>  | For calling Baidu translation API，required for the prompt modifiers `translate` and `beautify` shipped with this repository           |
 
 6. deploy the web service, by execute `npm run dev`
 

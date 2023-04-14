@@ -58,7 +58,7 @@ npm run dev
 | --------------------- | ------------------------------ | ------------------------------------------------------- |
 | OPENAI_API_KEY        |   <a href="https://platform.openai.com/account/api-keys" target="_blank">openai</a>     |用于调用openAI的官方接口 , gpt3-5及gpt3-5-enhanced模型需要使用该环境变量 |
 | REPLICATE_API_TOKEN    |  <a href="https://replicate.com" target="_blank">replicate</a>       | 用于调用replicate上的各类模型接口，模型gpt3-5-enhanced,replicate-* 模型需要使用该环境变量 |
-| BAIDU_TRANSLATE_APPID, BAIDU_TRANSLATE_SECRET  | <a href="https://replicate.com" target="_blank">baidu翻译</a>  | 用于调用百度翻译，translate 和  beautify 提示词优化器需要用到它们          |
+| BAIDU_TRANSLATE_APPID, BAIDU_TRANSLATE_SECRET  | <a href="http://api.fanyi.baidu.com/product/11" target="_blank">baidu翻译</a>  | 用于调用百度翻译，translate 和  beautify 提示词优化器需要用到它们          |
 
 6. 运行webui服务，打开浏览器界面
 ```
