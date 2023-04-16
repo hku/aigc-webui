@@ -18,7 +18,7 @@ export default async function generate(messages: Message[], prompt='') {
         id: 'gpt-3.5-turbo',
         name: 'GPT-3.5',
         maxLength: 12000,
-        tokenLimit: 3000
+        tokenLimit: 4000
     } 
 
     const key = process.env.OPENAI_API_KEY || ''
@@ -44,6 +44,7 @@ export default async function generate(messages: Message[], prompt='') {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
+
       // if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
       //   break;
       // }
@@ -52,6 +53,9 @@ export default async function generate(messages: Message[], prompt='') {
       messagesToSend = [message, ...messagesToSend];
     }
 
+    if (tokenCount > model.tokenLimit) {
+      return `Too many characters (tokens) for openai: ${tokenCount} > ${model.tokenLimit}`
+    } 
 
     encoding.free();
     const stream: ReadableStream | string = await OpenAIStream(model, promptToSend, key, messagesToSend);
