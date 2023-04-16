@@ -72,12 +72,17 @@ export default async function generate(messages: Message[], prompt='') {
       const message = messages[i];
       const tokens = encoding.encode(message.content);
 
-      if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
-        break;
-      }
+      // if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      //   break;
+      // }
       tokenCount += tokens.length;
       messagesToSend = [message, ...messagesToSend];
     }
+
+
+    if (tokenCount > model.tokenLimit) {
+      return `Too many characters (tokens) for openai: ${tokenCount} > ${model.tokenLimit}`
+    } 
 
     encoding.free();
     const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
