@@ -1,9 +1,15 @@
 import { AddinModifierID } from './addin';
 import { AddonModel } from './addon';
 
-export interface Message {
+
+
+export interface OpenAIMessage {
   role: Role;
   content: string;
+}
+
+export interface Message extends OpenAIMessage {
+  marked?: boolean;
 }
 
 export type Role = 'assistant' | 'user';

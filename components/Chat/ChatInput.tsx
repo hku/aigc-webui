@@ -9,6 +9,8 @@ import {
   IconPlayerStop,
   IconRepeat,
   IconSend,
+  IconUpload,
+  IconMicrophone,
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import {
@@ -25,7 +27,9 @@ import { VariableModal } from './VariableModal';
 import { AddinModifier, AddinModifierID } from '@/types/addin';
 import { AddinSelect } from './AddinSelect';
 import ICONS_DICT from '../../config/icons';
-
+import { IconDots } from '@tabler/icons-react';
+import PDFButton from './pdfButton';
+import pdf2text from '@/utils/app/pdf2text';
 
 interface Props {
   messageIsStreaming: boolean;
@@ -61,6 +65,8 @@ export const ChatInput: FC<Props> = ({
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showAddinSelect, serShowAddinSelect] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
   const [addinId, setAddinId] = useState<AddinModifierID | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
@@ -87,7 +93,6 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-
     onSend({ role: 'user', content}, addinId);
     setContent('');
 
@@ -95,7 +100,7 @@ export const ChatInput: FC<Props> = ({
       textareaRef.current.blur();
     }
   };
-
+  
   const handleStopConversation = () => {
     stopConversationRef.current = true;
     setTimeout(() => {
@@ -263,6 +268,13 @@ export const ChatInput: FC<Props> = ({
     return desc
   } 
 
+  const handleFileChange = async (file: File) => {
+
+    if (file.type === 'application/pdf') {
+      const text = await pdf2text(file);
+      setContent(`${content} ${text}`)
+    }
+  }
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
@@ -349,6 +361,32 @@ export const ChatInput: FC<Props> = ({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
+          {showMore && (
+            <div
+              className="absolute bottom-full right-10 w-32 py-0 bg-white shadow-md border border-gray-200"
+              onMouseEnter={() => setShowMore(true)}
+              onMouseLeave={() => setShowMore(false)}
+            >
+              <PDFButton onChange={handleFileChange}/>
+              <button 
+              onClick ={()=>{alert("to be done")}}
+              className="flex w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">
+                <IconMicrophone size={18} className="mr-2"/> 语音输入
+              </button>
+            </div>
+          )}
+
+          <button
+            className="absolute right-10 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
+          >
+            {messageIsStreaming ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-t-2 border-neutral-800 opacity-60 dark:border-neutral-100"></div>
+            ) : (
+              <IconDots size={18} 
+              onClick={() => setShowMore(!showMore)}
+              />
+            )}
+          </button>
 
           <button
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"

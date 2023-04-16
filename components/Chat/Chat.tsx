@@ -43,7 +43,7 @@ interface Props {
     conversation: Conversation,
     data: KeyValuePair,
   ) => void;
-  onEditMessage: (message: Message, messageIndex: number) => void;
+  onEditMessage: (message: Message, messageIndex: number, update?: boolean) => void;
   stopConversationRef: MutableRefObject<boolean>;
 }
 
@@ -240,6 +240,7 @@ export const Chat: FC<Props> = memo(
                   {conversation.messages.map((message, index) => (
                     <ChatMessage
                       key={index}
+                      hasMarker={(index===conversation.messages.length -1)?false:conversation.messages.some(m=>m.marked)}
                       message={message}
                       messageIndex={index}
                       onEditMessage={onEditMessage}

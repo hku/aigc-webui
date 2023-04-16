@@ -13,10 +13,20 @@ const handler = async (req: Request): Promise<Response> => {
     
     const chatbody = (await req.json()) as ChatBody;
 
-    const { messages, prompt, model, addinId} = chatbody;
+    let { messages, prompt, model, addinId} = chatbody;
+
+
 
     const lastMessage = messages.slice(-1)[0]
     const lastContent = lastMessage.content.trim()
+
+    //except the last message, only consider the marked message if exists
+    if(messages.some(m => m.marked)) {
+      messages = messages.filter(m => (m.marked) || (m === lastMessage))
+    }
+
+    console.log(19191919)
+    console.log(messages)
 
     if (lastContent && lastMessage.role === 'user') {
 

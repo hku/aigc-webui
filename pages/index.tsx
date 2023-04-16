@@ -107,7 +107,6 @@ const Home: React.FC<HomeProps> = ({
 
     const result = (await res.json()).result
     message.content = result
-    console.log(`message.conent: ${result}`)
     return message
   }
 
@@ -464,15 +463,26 @@ const Home: React.FC<HomeProps> = ({
     saveFolders(updatedFolders);
   };
 
-  const handleEditMessage = (message: Message, messageIndex: number) => {
+  const handleEditMessage = (message: Message, messageIndex: number, update:boolean = true) => {
+
     if (selectedConversation) {
-      const updatedMessages = selectedConversation.messages
-        .map((m, i) => {
-          if (i < messageIndex) {
-            return m;
-          }
-        })
-        .filter((m) => m) as Message[];
+
+
+      // const updatedMessages = update?selectedConversation.messages
+      //   .map((m, i) => {
+      //     if (i < messageIndex) {
+      //       return m;
+      //     }
+      //   })
+      //   .filter((m) => m) as Message[]:selectedConversation.messages;
+      update?selectedConversation.messages.slice(0, messageIndex):selectedConversation.messages
+
+      let updatedMessages = selectedConversation.messages;
+      if(update) {
+        updatedMessages.splice(messageIndex)
+      } else {
+        updatedMessages[messageIndex] = message
+      }
 
       const updatedConversation = {
         ...selectedConversation,
@@ -486,8 +496,10 @@ const Home: React.FC<HomeProps> = ({
 
       setSelectedConversation(single);
       setConversations(all);
-
-      setCurrentMessage(message);
+      
+      if(update) {
+        setCurrentMessage(message);
+      }
     }
   };
 

@@ -28,6 +28,9 @@ export const OpenAIStream = async (
   messages: Message[],
 ) => {
 
+  //openai api refuses additional attributes in messages 
+  messages.forEach(m => {delete m.marked})
+
   key = key.trim()
   if (key === '' || key === 'YOUR_KEY') {
     return `<span style="color:red">To use this model, you need to apply for an openai API_KEY, and fill in the API_KEY into the '.env.local' file. For details, please refer to the <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a> file</span>`
