@@ -157,7 +157,7 @@ const Home: React.FC<HomeProps> = ({
         const vectorStore = await MemoryVectorStore.fromDocuments(
           docs,
           new OpenAIEmbeddings({
-            openAIApiKey: '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'
+            openAIApiKey: ''
           })
         );
 
