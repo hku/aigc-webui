@@ -12,6 +12,7 @@
  
 - 可切换的AI创作模型，例如 ChatGPT，LLaMA，Stable Diffusion，Riffusion ... 或者你自己制作的AI模型
 - 多模态的输出，如image，audio，codeblock等
+- "chatPDF"功能, 你可以导入pdf文件, 然后在“分析模式”下，和这些文件“对话”.
 - 自带强化ChatGPT的插件，使ChatGPT可以绘画、作曲
 - 可切换的提示词预处理器，例如自动翻译，自动优化提示词（用户生成图画）
 - 可扩展、易开发的模型代理 （[开发指南](docs/Contributing.md)）

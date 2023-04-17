@@ -85,6 +85,9 @@ export const ChatInput: FC<Props> = ({
     updatePromptListVisibility(value);
   };
 
+  
+
+
   const handleSend = () => {
     if (messageIsStreaming) {
       return;
@@ -112,6 +115,36 @@ export const ChatInput: FC<Props> = ({
     }
   };
   
+  const handleFileChange = async (file: File) => {
+
+    if (messageIsStreaming) {
+      return;
+    }
+
+    if (file.type === 'application/pdf') {
+      let content = (await pdf2text(file)).trim();
+      if (!content) {
+        alert(t('Please enter a message'));
+        return;
+      }
+
+
+      const metadata: MessageMetadata = {}
+      if(tokenUtil.encoding) {
+        const tokens = tokenUtil.encoding.encode(content)
+        let tokenCount = tokens.length;
+        metadata.tokenCount = tokenCount
+        metadata.fromFile = file.name
+      }
+
+      content = `## ${file.name}\n\n${content}`
+
+      onSend({role: 'user', content,  metadata}, addinId);
+    }
+
+  }
+
+
   const handleStopConversation = () => {
     stopConversationRef.current = true;
     setTimeout(() => {
@@ -279,13 +312,7 @@ export const ChatInput: FC<Props> = ({
     return desc
   } 
 
-  const handleFileChange = async (file: File) => {
 
-    if (file.type === 'application/pdf') {
-      const text = await pdf2text(file);
-      setContent(`${content} ${text}`)
-    }
-  }
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">

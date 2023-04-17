@@ -13,6 +13,7 @@ export const metadata = {
     description: 'this is the model agent of openai gpt3.5-turbo',
     env: ["OPENAI_API_KEY"],
     supportBrowser: true,
+    supportAnalysisMode: true,
     freeSystemPrompt: true,
 }
 

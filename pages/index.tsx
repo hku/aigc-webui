@@ -129,40 +129,16 @@ const Home: React.FC<HomeProps> = ({
         updatedMessages.splice(-deleteCount)
       } 
       const is_long_text = (message.metadata?.tokenCount) > MAX_TOKEN_COUNT
+      const is_from_file = (message.metadata?.fromFile)
 
-      if( !is_long_text ) {
+
+      if( !(is_long_text || is_from_file) ) {
         await modifyUserPrompt(message, addinId)
       }
 
-      if(is_long_text) {
+      if(is_long_text || is_from_file) {
         message.metadata = message.metadata || {}
         message.metadata.marked = true 
-      }
-
-      const is_from_file = true 
-      
-      if(is_long_text || is_from_file) {
-        
-
-        const splitter = new TokenTextSplitter({
-          encodingName: "gpt2",
-          chunkSize: 100,
-          chunkOverlap: 0,
-        });
-
-        const docs = await splitter.createDocuments([message.content]);        
-
-        console.log(666666666)
-        
-        const vectorStore = await MemoryVectorStore.fromDocuments(
-          docs,
-          new OpenAIEmbeddings({
-            openAIApiKey: ''
-          })
-        );
-
-        const resultOne = await vectorStore.similaritySearch("hello world", 1);
-    
       }
 
       updatedConversation = {
@@ -180,11 +156,22 @@ const Home: React.FC<HomeProps> = ({
           name: customName,
         };
       }
-
-      if(is_long_text) {
+      if(is_from_file) {
         const updatedMessages: Message[] = [
           ...updatedConversation.messages,
-          { role: 'assistant', content:  t('quite a long text (tokens), entering anaysis mode now.')},
+          { role: 'assistant', content: message.metadata?.fromFile + t(' imported in analysis mode, now you can "chat" with the file.')},
+        ];
+        updatedConversation = {
+          ...updatedConversation,
+          messages: updatedMessages,
+        };
+        setSelectedConversation(updatedConversation);        
+
+      }
+      else if(is_long_text) {
+        const updatedMessages: Message[] = [
+          ...updatedConversation.messages,
+          { role: 'assistant', content:  t('quite many words (tokens), entering anaysis mode now.')},
         ];
         updatedConversation = {
           ...updatedConversation,
@@ -217,7 +204,11 @@ const Home: React.FC<HomeProps> = ({
         let response: Response | null = null 
 
         if(updatedConversation.model?.supportBrowser) {
-          response = await clientChatHandler(updatedConversation.messages, updatedConversation.prompt, updatedConversation.model)
+          response = await clientChatHandler(
+            updatedConversation.messages, 
+            updatedConversation.prompt, 
+            updatedConversation.model
+          )
         } else {
           response = await fetch('/api/chat', {
             method: 'POST',

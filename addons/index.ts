@@ -2,6 +2,10 @@ import { AnyNode } from 'postcss';
 import addonsManifest from '../addons-manifest.json';
 import { Message } from '@/types/chat';
 import { AddonModel } from '@/types/addon';
+import { TokenTextSplitter } from 'langchain/text_splitter';
+import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
+import { MemoryVectorStore } from 'langchain/vectorstores/memory';
+import { markAsUntransferable } from 'worker_threads';
 
 interface Addons {
   [key: string]: any
@@ -54,12 +58,12 @@ class ModelAgent {
     }
 
     async generate(messages: Message[], prompt: string, model: AddonModel) {
-        const {id, env} = model
+        const {id, env, supportAnalysisMode} = model
         
+        const analysisMode = messages.some(m => m.metadata?.marked)
         const isBrowser = (typeof window === 'object')
         
         let tokens: any[]|null = null
-
         if(env instanceof Array) {
             tokens = env.map(v => {
                 const t = isBrowser?(localStorage && localStorage.getItem(v)):(process && process?.env?.[v])
@@ -76,6 +80,44 @@ class ModelAgent {
                     }
                 }
             }
+        }
+
+
+        if(analysisMode) {
+
+            if(!supportAnalysisMode) {
+                return `<span style="color:red">${model.name} do not support analysis mode.</span>`
+            }
+
+
+            const CHUNK_SIZE = 100
+            const SIMILAR_TOP = 10
+
+            const splitter = new TokenTextSplitter({
+                encodingName: "gpt2",
+                chunkSize: CHUNK_SIZE,
+                chunkOverlap: 0,
+            });
+            const openAIApiKey = isBrowser?(localStorage && localStorage.getItem("OPENAI_API_KEY")):(process && process?.env?.["OPENAI_API_KEY"])
+            const embedding = new OpenAIEmbeddings({
+                openAIApiKey: openAIApiKey || ""
+            })
+
+            const lastMessage = messages.slice(-1)[0]
+            const lastContent = lastMessage.content.trim()
+            const markedMessages = messages.filter(m => (m.metadata?.marked)).map(m => ({...m}))
+            const markdedDocs = []
+
+            for(const m of markedMessages) {
+                const docs = await splitter.createDocuments([m.content]);
+                const vectorStore = await MemoryVectorStore.fromDocuments(docs, embedding);
+                const relevantDocs = await vectorStore.similaritySearch(lastContent, SIMILAR_TOP);
+                const relevantContent = relevantDocs.map(r => r.pageContent).join(" ")
+                m.content = relevantContent
+                console.log(relevantContent)
+            }
+            
+            messages = [...markedMessages, lastMessage]
         }
 
 
