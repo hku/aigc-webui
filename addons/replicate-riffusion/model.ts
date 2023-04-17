@@ -11,15 +11,16 @@ export const metadata = {
     description: `
     this is the model agent for music generation powered by riffusion api on replicate.
 The favorable language for this model is English.
-`
+`,
+  env: ["REPLICATE_API_TOKEN"],
 }
 
-export default async function generate(messages: Message[], prompt='') {
+export default async function generate(messages: Message[], prompt='', tokens: string[]) {
 
   const txt = messages.filter(m => m.role === 'user' ).pop()?.content || "funky synth solo"
 
   const client =new ReplicateClient(
-    process.env.REPLICATE_API_TOKEN || '',
+    tokens[0],
     "riffusion/riffusion:8cf61ea6c56afd61d8f5b9ffd14d7c216c0a93844ce2d82ac1c9ecc9c7f24e05",
   )
   

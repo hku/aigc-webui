@@ -5,3 +5,5 @@ export const OPENAI_API_HOST =
   process.env.OPENAI_API_HOST || 'https://api.openai.com';
 
 
+export const MAX_TOKEN_COUNT = 3000
+

@@ -48,7 +48,6 @@ export const after_input = async (prompt: string) => {
       
       const result = await res.json()
 
-      console.log(`res: ${JSON.stringify(result)}`)
 
       result_text = result.trans_result[0].dst
 

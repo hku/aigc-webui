@@ -16,6 +16,8 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
+import { metadata } from '@/addins/beautify';
+import { MAX_TOKEN_COUNT } from '@/utils/app/const';
 
 interface Props {
   message: Message;
@@ -145,7 +147,7 @@ export const ChatMessage: FC<Props> = memo(
                   //   {message.content}
                   // </div>
                   <MemoizedReactMarkdown
-                  className={`prose dark:prose-invert ${message.marked?"text-green-500":hasMarker?"text-gray-500":""}`}
+                  className={`prose dark:prose-invert ${message.metadata?.marked?"text-green-500":hasMarker?"text-gray-500":""}`}
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeMathjax, rehypeRaw]}
                   components={{
@@ -188,7 +190,7 @@ export const ChatMessage: FC<Props> = memo(
                     },
                   }}
                 >
-                  {message.content}
+                  {message.metadata?.tokenCount>MAX_TOKEN_COUNT?message.content.slice(0, 1000) + '....':message.content}
                 </MemoizedReactMarkdown>
                 )}
 
@@ -211,10 +213,12 @@ export const ChatMessage: FC<Props> = memo(
                   <button
                     className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
                     onClick={()=>{
-                      onEditMessage({ ...message, marked: !message.marked}, messageIndex, false);
+                      const marked = !message.metadata?.marked
+                      const metadata = {...(message.metadata || {}), marked}
+                      onEditMessage({...message, metadata}, messageIndex, false);
                     }}
                   >
-                    <IconStarFilled size={20} className={`translate-x-2 ${message.marked?"text-green-500":""}`}/>
+                    <IconStarFilled size={20} className={`translate-x-2 ${message.metadata?.marked?"text-green-500":""}`}/>
                   </button>                
                   <div className="absolute w-48 left-10 -mt-24 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
                     when some of the green Lanterns are lighted, the gpt answer will focus on the lighted messages.
@@ -250,10 +254,12 @@ export const ChatMessage: FC<Props> = memo(
                   <button
                       className="translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300"
                       onClick={()=>{
-                        onEditMessage({ ...message, marked: !message.marked}, messageIndex, false);
+                        const marked = !message.metadata?.marked
+                        const metadata = {...(message.metadata || {}), marked}
+                        onEditMessage({...message, metadata}, messageIndex, false);
                       }}
                   >
-                    <IconStarFilled size={20} className={`translate-x-2 ${message.marked?"text-green-500":""}`}/>
+                    <IconStarFilled size={20} className={`translate-x-2 ${message.metadata?.marked?"text-green-500":""}`}/>
                   </button>
 
                     <div className="absolute w-48 left-10 -mt-24 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
@@ -263,7 +269,7 @@ export const ChatMessage: FC<Props> = memo(
                 </div>
 
                 <MemoizedReactMarkdown
-                  className={`prose dark:prose-invert ${message.marked?"text-green-500":hasMarker?"text-gray-500":""}`}
+                  className={`prose dark:prose-invert ${message.metadata?.marked?"text-green-500":hasMarker?"text-gray-500":""}`}
                   remarkPlugins={[remarkGfm, remarkMath]}
                   rehypePlugins={[rehypeMathjax, rehypeRaw]}
                   components={{

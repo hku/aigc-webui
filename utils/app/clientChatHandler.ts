@@ -3,20 +3,12 @@ import { ChatBody, Message } from '@/types/chat';
 import promptModifier from '../../addins';
 
 import modelAgent  from '../../addons';
+import { AddonModel } from '@/types/addon';
 
-export const config = {
-  runtime: 'edge',
-};
 
-const handler = async (req: Request): Promise<Response> => {
+const clientChatHandler = async (messages: Message[], prompt: string, model: AddonModel): Promise<Response> => {
   try {
     
-    const chatbody = (await req.json()) as ChatBody;
-
-    let { messages, prompt, model, addinId} = chatbody;
-
-
-
     const lastMessage = messages.slice(-1)[0]
     const lastContent = lastMessage.content.trim()
 
@@ -37,6 +29,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
 
+
     const res = await modelAgent.generate(messages, prompt, model)
 
     return new Response(res);
@@ -49,4 +42,4 @@ const handler = async (req: Request): Promise<Response> => {
   }
 };
 
-export default handler;
+export default clientChatHandler;

@@ -18,7 +18,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, MAX_TOKEN_COUNT } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -44,6 +44,11 @@ import addinsManifest from "../addins-manifest.json"
 import defaultPrompts from '../config/defaultPrompts.json'
 
 import { AddinModifier, AddinModifierID } from '@/types/addin';
+
+import { TokenTextSplitter } from "langchain/text_splitter";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import clientChatHandler from '@/utils/app/clientChatHandler';
 
 const addonsIds = addonsManifest as string[]
 
@@ -118,71 +123,132 @@ const Home: React.FC<HomeProps> = ({
     if (selectedConversation) {
       let updatedConversation: Conversation;
 
-
       const updatedMessages = [...selectedConversation.messages];
 
       if (deleteCount>0) {
         updatedMessages.splice(-deleteCount)
       } 
+      const is_long_text = (message.metadata?.tokenCount) > MAX_TOKEN_COUNT
 
-      await modifyUserPrompt(message, addinId)
+      if( !is_long_text ) {
+        await modifyUserPrompt(message, addinId)
+      }
+
+      if(is_long_text) {
+        message.metadata = message.metadata || {}
+        message.metadata.marked = true 
+      }
+
+      const is_from_file = true 
+      
+      if(is_long_text || is_from_file) {
+        
+
+        const splitter = new TokenTextSplitter({
+          encodingName: "gpt2",
+          chunkSize: 100,
+          chunkOverlap: 0,
+        });
+
+        const docs = await splitter.createDocuments([message.content]);        
+
+        console.log(666666666)
+        
+        const vectorStore = await MemoryVectorStore.fromDocuments(
+          docs,
+          new OpenAIEmbeddings({
+            openAIApiKey: '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'
+          })
+        );
+
+        const resultOne = await vectorStore.similaritySearch("hello world", 1);
+    
+      }
 
       updatedConversation = {
         ...selectedConversation,
         messages: [...updatedMessages, message],
       };
+           
+      if (updatedConversation.messages.length === 1) {
+        const { content } = message;
+        const customName =
+          content.length > 30 ? content.substring(0, 30) + '...' : content;
 
-      setSelectedConversation(updatedConversation);
-      setLoading(true);
-      setMessageIsStreaming(true);
-      
-      const chatBody: ChatBody = {
-        model: updatedConversation.model,
-        messages: updatedConversation.messages,
-        prompt: updatedConversation.prompt,
-        addinId
-      };
-
-
-      let body;
-
-      body = JSON.stringify(chatBody);
-  
-
-      const controller = new AbortController();
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
-        body,
-      });
-
-      if (!response.ok) {
-        setLoading(false);
-        setMessageIsStreaming(false);
-        toast.error(response.statusText);
-        return;
+        updatedConversation = {
+          ...updatedConversation,
+          name: customName,
+        };
       }
 
-      const data = response.body;
+      if(is_long_text) {
+        const updatedMessages: Message[] = [
+          ...updatedConversation.messages,
+          { role: 'assistant', content:  t('quite a long text (tokens), entering anaysis mode now.')},
+        ];
+        updatedConversation = {
+          ...updatedConversation,
+          messages: updatedMessages,
+        };
+        setSelectedConversation(updatedConversation);
 
-      if (!data) {
-        setLoading(false);
-        setMessageIsStreaming(false);
-        return;
-      }
+      } else  {
 
-        if (updatedConversation.messages.length === 1) {
-          const { content } = message;
-          const customName =
-            content.length > 30 ? content.substring(0, 30) + '...' : content;
+        setSelectedConversation(updatedConversation);
 
-          updatedConversation = {
-            ...updatedConversation,
-            name: customName,
-          };
+        setLoading(true);
+        setMessageIsStreaming(true);
+        
+        const chatBody: ChatBody = {
+          model: updatedConversation.model,
+          messages: updatedConversation.messages,
+          prompt: updatedConversation.prompt,
+          addinId
+        };
+
+
+        let body;
+
+        body = JSON.stringify(chatBody);
+    
+
+        const controller = new AbortController();
+
+        let response: Response | null = null 
+
+        if(updatedConversation.model?.supportBrowser) {
+          response = await clientChatHandler(updatedConversation.messages, updatedConversation.prompt, updatedConversation.model)
+        } else {
+          response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+            body,
+          });
+        }
+
+        
+
+
+
+        
+
+
+        if (!response.ok) {
+          setLoading(false);
+          setMessageIsStreaming(false);
+          toast.error(response.statusText);
+          return;
+        }
+
+        const data = response.body;
+
+        if (!data) {
+          setLoading(false);
+          setMessageIsStreaming(false);
+          return;
         }
 
         setLoading(false);
@@ -240,10 +306,7 @@ const Home: React.FC<HomeProps> = ({
             setSelectedConversation(updatedConversation);
           }
         }
-
-        // console.log('-----------')
-        // console.log(JSON.stringify(updatedConversation.messages.slice(-1)[0]))
-        // console.log('-----------')
+      }
         
         saveConversation(updatedConversation);
 
@@ -382,9 +445,7 @@ const Home: React.FC<HomeProps> = ({
       name: `${t('New Conversation')}`,
       messages: [],
       model: lastConversation?.model || {
-        id: AndonModels[defaultModelId].id,
-        name: AndonModels[defaultModelId].name,
-        description: AndonModels[defaultModelId].description
+        ...AndonModels[defaultModelId],
       },
       prompt: DEFAULT_SYSTEM_PROMPT,
       folderId: null,

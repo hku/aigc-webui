@@ -1,8 +1,9 @@
 import { Message } from '@/types/chat';
-import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, MAX_TOKEN_COUNT } from '@/utils/app/const';
 import { OpenAIStream } from '@/utils/server/openai';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 import { Tiktoken, init } from '@dqbd/tiktoken/lite/init';
+
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
 
@@ -10,19 +11,19 @@ import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module
 export const metadata = {
     name: 'gpt-3.5-turbo',
     description: 'this is the model agent of openai gpt3.5-turbo',
-    freeSystemPrompt: true
+    env: ["OPENAI_API_KEY"],
+    supportBrowser: true,
+    freeSystemPrompt: true,
 }
 
-export default async function generate(messages: Message[], prompt='') {
+export default async function generate(messages: Message[], prompt='', tokens: string[]) {
     const model = {
         id: 'gpt-3.5-turbo',
         name: 'GPT-3.5',
         maxLength: 12000,
-        tokenLimit: 4000
+        tokenLimit: MAX_TOKEN_COUNT
     } 
-
-    const key = process.env.OPENAI_API_KEY || ''
-
+    
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
       tiktokenModel.bpe_ranks,
@@ -45,19 +46,21 @@ export default async function generate(messages: Message[], prompt='') {
       const tokens = encoding.encode(message.content);
 
 
-      // if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+      tokenCount += tokens.length;
+      messagesToSend = [message, ...messagesToSend];
+
+      // if (tokenCount + tokens.length > model.tokenLimit) {
+      //   message.marked = true
       //   break;
       // }
 
-      tokenCount += tokens.length;
-      messagesToSend = [message, ...messagesToSend];
     }
 
     if (tokenCount > model.tokenLimit) {
-      return `Too many characters (tokens) for openai: ${tokenCount} > ${model.tokenLimit}`
+      return `Too many characters (tokens) for openai: ${tokenCount} > ${model.tokenLimit}, please enable analysis mode...`
     } 
 
     encoding.free();
-    const stream: ReadableStream | string = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    const stream: ReadableStream | string = await OpenAIStream(model, promptToSend, tokens[0], messagesToSend);
     return stream 
 }

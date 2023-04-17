@@ -1,4 +1,4 @@
-import { Message } from '@/types/chat';
+import { Message, MessageMetadata } from '@/types/chat';
 import { AddonModel } from '@/types/addon';
 import { Prompt } from '@/types/prompt';
 import {
@@ -30,6 +30,8 @@ import ICONS_DICT from '../../config/icons';
 import { IconDots } from '@tabler/icons-react';
 import PDFButton from './pdfButton';
 import pdf2text from '@/utils/app/pdf2text';
+import { tokenUtil } from '@/utils/app/tokenUtil';
+import { MAX_TOKEN_COUNT } from '@/utils/app/const';
 
 interface Props {
   messageIsStreaming: boolean;
@@ -93,7 +95,16 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    onSend({ role: 'user', content}, addinId);
+
+    const metadata: MessageMetadata = {}
+    if(tokenUtil.encoding) {
+      const tokens = tokenUtil.encoding.encode(content)
+      let tokenCount = tokens.length;
+      metadata.tokenCount = tokenCount
+    }
+
+    onSend({role: 'user', content,  metadata}, addinId);
+
     setContent('');
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {

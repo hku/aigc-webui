@@ -1,7 +1,10 @@
+import {metadata} from "../addons/gpt3-5/model"
+
 export interface AddonModel {
   id: string;
   name: string;
   description: string;
+  [key: string]: any
 }
 
 
@@ -14,7 +17,6 @@ export const fallbackModelID = 'gpt3-5';
 export const AndonModels: Record<AddonModelID, AddonModel> = {
  'gpt3-5': {
   id: 'gpt3-5',
-  name: 'gpt3.5-turbo',
-  description: 'this is the model agent of openai gpt3.5-turbo'
+  ...metadata,  
  }
 };

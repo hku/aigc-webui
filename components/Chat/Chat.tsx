@@ -240,7 +240,7 @@ export const Chat: FC<Props> = memo(
                   {conversation.messages.map((message, index) => (
                     <ChatMessage
                       key={index}
-                      hasMarker={(index===conversation.messages.length -1)?false:conversation.messages.some(m=>m.marked)}
+                      hasMarker={(index===conversation.messages.length -1)?false:conversation.messages.some(m=>m.metadata?.marked)}
                       message={message}
                       messageIndex={index}
                       onEditMessage={onEditMessage}

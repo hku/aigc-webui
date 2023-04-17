@@ -29,7 +29,7 @@ export const OpenAIStream = async (
 ) => {
 
   //openai api refuses additional attributes in messages 
-  messages.forEach(m => {delete m.marked})
+  messages.forEach(m => {delete m.metadata})
 
   key = key.trim()
   if (key === '' || key === 'YOUR_KEY') {
@@ -87,17 +87,19 @@ export const OpenAIStream = async (
     }
   }
 
+
+
   const stream = new ReadableStream({
     async start(controller) {
       const onParse = (event: ParsedEvent | ReconnectInterval) => {
         if (event.type === 'event') {
           const data = event.data;
-
+  
           if (data === '[DONE]') {
             controller.close();
             return;
           }
-
+  
           try {
             const json = JSON.parse(data);
             const text = json.choices[0].delta.content;
@@ -108,14 +110,63 @@ export const OpenAIStream = async (
           }
         }
       };
-
+  
       const parser = createParser(onParse);
-
-      for await (const chunk of res.body as any) {
-        parser.feed(decoder.decode(chunk));
+  
+      // Consume the response body using async iterator
+      const reader = res.body.getReader();
+  
+      try {
+        while (true) {
+          const { value, done } = await reader.read();
+  
+          if (done) {
+            break;
+          }
+  
+          parser.feed(decoder.decode(value));
+        }
+      } catch (error) {
+        console.error('Error reading from response body:', error);
+      } finally {
+        reader.releaseLock();
       }
     },
   });
+
+  
+  // const stream = new ReadableStream({
+  //   async start(controller) {
+  //     const onParse = (event: ParsedEvent | ReconnectInterval) => {
+  //       if (event.type === 'event') {
+  //         const data = event.data;
+
+  //         if (data === '[DONE]') {
+  //           controller.close();
+  //           return;
+  //         }
+
+  //         try {
+  //           const json = JSON.parse(data);
+  //           const text = json.choices[0].delta.content;
+  //           console.log(text)
+  //           const queue = encoder.encode(text);
+  //           controller.enqueue(queue);
+  //         } catch (e) {
+  //           controller.error(e);
+  //         }
+  //       }
+  //     };
+
+  //     const parser = createParser(onParse);
+
+
+  //     for await (const chunk of res.body as any) {
+  //     // for (const chunk of res.body as any) {
+  //       parser.feed(decoder.decode(chunk));
+  //     }
+  //   },
+  // });
 
   return stream;
 

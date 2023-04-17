@@ -6,15 +6,16 @@ export const metadata = {
     name: 'replicate-llama-7b',
     description: `
     this is a simple model agent for llama-7b deployed on replicate. Sample Input: "Simply put, Quantum Mechanics states that"
-`
+`,
+  env: ["REPLICATE_API_TOKEN"],
 }
 
-export default async function generate(messages: Message[], prompt='') {
+export default async function generate(messages: Message[], prompt='', tokens: string[]) {
 
   const txt = messages.filter(m => m.role === 'user' ).pop()?.content || "Simply put, the theory of relativity states that"
 
   const client =new ReplicateClient(
-    process.env.REPLICATE_API_TOKEN || '',
+    tokens[0],
     "replicate/llama-7b:455d66312a66299fba685548fe24f66880f093007b927abd19f4356295f8577c"
   )
 

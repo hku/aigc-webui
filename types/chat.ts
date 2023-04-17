@@ -2,6 +2,9 @@ import { AddinModifierID } from './addin';
 import { AddonModel } from './addon';
 
 
+export interface MessageMetadata {
+  [key: string]: any
+}
 
 export interface OpenAIMessage {
   role: Role;
@@ -9,7 +12,7 @@ export interface OpenAIMessage {
 }
 
 export interface Message extends OpenAIMessage {
-  marked?: boolean;
+  metadata?: MessageMetadata;
 }
 
 export type Role = 'assistant' | 'user';

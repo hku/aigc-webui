@@ -1,6 +1,7 @@
 import { AnyNode } from 'postcss';
 import addonsManifest from '../addons-manifest.json';
 import { Message } from '@/types/chat';
+import { AddonModel } from '@/types/addon';
 
 interface Addons {
   [key: string]: any
@@ -52,11 +53,36 @@ class ModelAgent {
           cb()
     }
 
-    async generate(messages: Message[], prompt: string, key = 'gpt3-5') {
-        this.active = key;
+    async generate(messages: Message[], prompt: string, model: AddonModel) {
+        const {id, env} = model
+        
+        const isBrowser = (typeof window === 'object')
+        
+        let tokens: any[]|null = null
+
+        if(env instanceof Array) {
+            tokens = env.map(v => {
+                const t = isBrowser?(localStorage && localStorage.getItem(v)):(process && process?.env?.[v])
+                return t || null
+            })
+            
+            for(let i=0; i<env.length; i++) {
+                const t = tokens[i]
+                if(t === null) {
+                    if(isBrowser) {
+                        return `<span style="color:red">The required token is not set, please input the value of ${env[i]} in <a href="/setting/${id}" target="_blank">the setting page</a></span>`
+                    } else {
+                        return `<span style="color:red">To use this model, you need to fill in the ${env[i]} into the '.env.local' file. For details, please refer to the <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a> file</span>`
+                    }
+                }
+            }
+        }
+
+
+        this.active = id;
         const obj = this._object[this.active]
         try {
-            return await obj.default(messages, prompt)
+            return await obj.default(messages, prompt, tokens)
         } catch(e) {
             return `error: ${e as string}`
         }
