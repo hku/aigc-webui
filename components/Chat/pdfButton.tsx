@@ -32,7 +32,7 @@ const PDFButton = ({onChange}: Props) => {
         <input ref={refInput} style={{width:0, height:0, visibility:"hidden"}}
             type="file"
             id="pdf-file"
-            accept=".pdf, .doc, .docx"
+            accept=".pdf, .doc, .docx, .xls, .xlsx"
             onChange={handleFileChange}
             className="hidden"
         />
