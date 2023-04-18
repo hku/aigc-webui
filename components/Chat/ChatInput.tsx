@@ -24,7 +24,7 @@ import {
 } from 'react';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
-import { AddinModifier, AddinModifierID } from '@/types/addin';
+import { AddinModifier, AddinModifierID, FileLoader } from '@/types/addin';
 import { AddinSelect } from './AddinSelect';
 import ICONS_DICT from '../../config/icons';
 import { IconDots } from '@tabler/icons-react';
@@ -32,11 +32,14 @@ import PDFButton from './pdfButton';
 import pdf2text from '@/utils/app/pdf2text';
 import { tokenUtil } from '@/utils/app/tokenUtil';
 import { MAX_TOKEN_COUNT } from '@/utils/app/const';
+import { toast } from 'react-hot-toast';
+import promptModifier from '@/addins';
 
 interface Props {
   messageIsStreaming: boolean;
   model: AddonModel;
   addinModifiers: AddinModifier[];
+  fileLoaderDict: {[key: string]: FileLoader},
   conversationIsEmpty: boolean;
   prompts: Prompt[];
   onSend: (message: Message, addinId: AddinModifierID | null) => void;
@@ -49,6 +52,7 @@ export const ChatInput: FC<Props> = ({
   messageIsStreaming,
   model,
   addinModifiers,
+  fileLoaderDict,
   conversationIsEmpty,
   prompts,
   onSend,
@@ -121,25 +125,51 @@ export const ChatInput: FC<Props> = ({
       return;
     }
 
-    if (file.type === 'application/pdf') {
-      let content = (await pdf2text(file)).trim();
-      if (!content) {
-        alert(t('Please enter a message'));
-        return;
+
+
+
+    // const matches = /application\/(\w*)$/.exec(file.type)
+    // const fileType = matches && matches[1]
+
+    const fileType = (file.name).split('.')[1]
+
+
+
+    const fileLoader = fileLoaderDict && fileLoaderDict[fileType as string]
+
+    console.log(file.name)
+
+    if (fileLoader) {
+      try {
+        const {content, metadata} = await promptModifier.load_content(file, fileLoader.id)
+        
+        onSend({role: 'user', content,  metadata}, addinId);
+
+      } catch(e) {
+        toast.error('failed load the file')
+        return
       }
 
+    //   let content = (await pdf2text(file)).trim();
 
-      const metadata: MessageMetadata = {}
-      if(tokenUtil.encoding) {
-        const tokens = tokenUtil.encoding.encode(content)
-        let tokenCount = tokens.length;
-        metadata.tokenCount = tokenCount
-        metadata.fromFile = file.name
-      }
 
-      content = `## ${file.name}\n\n${content}`
+    //   if (!content) {
+    //     alert(t('Please enter a message'));
+    //     return;
+    //   }
 
-      onSend({role: 'user', content,  metadata}, addinId);
+    //   const metadata: MessageMetadata = {}
+    //   if(tokenUtil.encoding) {
+    //     const tokens = tokenUtil.encoding.encode(content)
+    //     let tokenCount = tokens.length;
+    //     metadata.tokenCount = tokenCount
+    //     metadata.fromFile = file.name
+    //   }
+
+    //   content = `## ${file.name}\n\n${content}`
+
+    } else {
+      toast.error("file not supported")
     }
 
   }
@@ -401,7 +431,7 @@ export const ChatInput: FC<Props> = ({
           />
           {showMore && (
             <div
-              className="absolute bottom-full right-10 w-32 py-0 bg-white shadow-md border border-gray-200"
+              className="absolute bottom-full right-10 w-64 py-0 bg-white shadow-md border border-gray-200"
               onMouseEnter={() => setShowMore(true)}
               onMouseLeave={() => setShowMore(false)}
             >
@@ -409,7 +439,7 @@ export const ChatInput: FC<Props> = ({
               <button 
               onClick ={()=>{alert("to be done")}}
               className="flex w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">
-                <IconMicrophone size={18} className="mr-2"/> 语音输入
+                <IconMicrophone size={18} className="mr-2"/> Speech
               </button>
             </div>
           )}

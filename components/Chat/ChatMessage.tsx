@@ -16,7 +16,6 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { CodeBlock } from '../Markdown/CodeBlock';
 import { MemoizedReactMarkdown } from '../Markdown/MemoizedReactMarkdown';
-import { metadata } from '@/addins/beautify';
 import { MAX_TOKEN_COUNT } from '@/utils/app/const';
 
 interface Props {

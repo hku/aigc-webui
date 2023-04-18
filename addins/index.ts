@@ -2,7 +2,7 @@ import { AddinModifierID } from '@/types/addin';
 import addinsManifest from '../addins-manifest.json';
 
 export type Addin = {
-    [key in 'before_input' | 'after_input' | 'metadata']: any;
+    [key in 'load_content' | 'after_input' | 'metadata']: any;
 }; 
 
 export interface Addins {
@@ -32,15 +32,17 @@ class PromptModifier {
         const addins: Addins = {}
         for (const name of addinsManifest as string[]) {
             const scriptModule = await import(`../addins/${name}/index.ts`);
+            
             addins[name] = scriptModule;
           }
+
           this._reset(addins)
           cb()
     }
 
     async modify(prompt: string, key: AddinModifierID) {
             const obj = this._object[key]
-            if(obj) {
+            if(obj && obj.after_input) {
                 try {
                     return await obj.after_input(prompt)
                 } catch(e) {
@@ -50,7 +52,23 @@ class PromptModifier {
             }
             return prompt
     }
-  }
+    async load_content(file: File, key: AddinModifierID) {
+
+        const obj = this._object[key]
+        if(obj && obj.load_content) {
+            try {
+                return await obj.load_content(file)
+            } catch(e) {
+                console.log(e)
+                throw new Error("load content failed")
+            } 
+        } else {
+            throw new Error("this widget is not a file loader")
+        }
+           
+    }
+
+}
 
 const promptModifier =  new PromptModifier({})
 promptModifier.load(addinsManifest)

@@ -86,7 +86,7 @@ class ModelAgent {
         if(analysisMode) {
 
             if(!supportAnalysisMode) {
-                return `<span style="color:red">${model.name} do not support analysis mode.</span>`
+                return `<span style="color:red">${model.name} do not support analysis mode, please choose another model at the model selector, for example, chatGPT(turbo).</span>`
             }
 
 

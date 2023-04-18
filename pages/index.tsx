@@ -18,7 +18,7 @@ import {
   cleanConversationHistory,
   cleanSelectedConversation,
 } from '@/utils/app/clean';
-import { DEFAULT_SYSTEM_PROMPT, MAX_TOKEN_COUNT } from '@/utils/app/const';
+import { DEFAULT_SYSTEM_PROMPT, MAX_TOKEN_COUNT, LOW_TOKEN_COUNT } from '@/utils/app/const';
 import {
   saveConversation,
   saveConversations,
@@ -43,7 +43,7 @@ import addinsManifest from "../addins-manifest.json"
 
 import defaultPrompts from '../config/defaultPrompts.json'
 
-import { AddinModifier, AddinModifierID } from '@/types/addin';
+import { AddinModifier, AddinModifierID, FileLoader } from '@/types/addin';
 
 import { TokenTextSplitter } from "langchain/text_splitter";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
@@ -55,6 +55,7 @@ const addonsIds = addonsManifest as string[]
 interface HomeProps {
   defaultModelId: AddonModelID;
   addinModifiers:  AddinModifier[];
+  fileLoaderDict: {[key:string]: FileLoader};
   addonModels: AddonModel[];
   FreeSystemPromptModelIDs: AddonModelID[]
 }
@@ -62,6 +63,7 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({
   defaultModelId,
   addinModifiers,
+  fileLoaderDict,
   addonModels,
   FreeSystemPromptModelIDs
 }) => {
@@ -130,16 +132,18 @@ const Home: React.FC<HomeProps> = ({
       } 
       const is_long_text = (message.metadata?.tokenCount) > MAX_TOKEN_COUNT
       const is_from_file = (message.metadata?.fromFile)
+      const is_short_text = (message.metadata?.tokenCount) < LOW_TOKEN_COUNT
 
+      const should_mark = is_long_text || (is_from_file && (!is_short_text))
 
       if( !(is_long_text || is_from_file) ) {
         await modifyUserPrompt(message, addinId)
       }
 
-      if(is_long_text || is_from_file) {
+      if(should_mark) {
         message.metadata = message.metadata || {}
         message.metadata.marked = true 
-      }
+      } 
 
       updatedConversation = {
         ...selectedConversation,
@@ -159,7 +163,7 @@ const Home: React.FC<HomeProps> = ({
       if(is_from_file) {
         const updatedMessages: Message[] = [
           ...updatedConversation.messages,
-          { role: 'assistant', content: message.metadata?.fromFile + t(' imported in analysis mode, now you can "chat" with the file.')},
+          { role: 'assistant', content: message.metadata?.fromFile + t(' imported, now you can "chat" with the file.') + (should_mark?`(#token: ${message.metadata?.tokenCount}, "analysis mode" is turned on)`:'')},
         ];
         updatedConversation = {
           ...updatedConversation,
@@ -752,6 +756,7 @@ const Home: React.FC<HomeProps> = ({
                 messageIsStreaming={messageIsStreaming}
                 defaultModelId={defaultModelId}
                 addinModifiers = {addinModifiers}
+                fileLoaderDict={fileLoaderDict}
                 FreeSystemPromptModelIDs={FreeSystemPromptModelIDs}
                 modelError={modelError}
                 models={addonModels}
@@ -815,12 +820,31 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
   
   const addinModifiers: AddinModifier[] = []
+  const fileLoaderDict: {[key:string]: FileLoader} = {};
   
   for (const k of addinsManifest as string[]) {
+
     const scriptModule = await import(`../addins/${k}`);
-    const metadata = scriptModule.metadata || {name: 'unknown', description: "unknown"}
+
+    if(scriptModule.after_input) {
+      const metadata = scriptModule.metadata || {name: 'unknown', description: "unknown"}
       addinModifiers.push({id: k, ...metadata  })
+    } 
+
+    if(scriptModule.load_content) {
+      const metadata = scriptModule.metadata || {}
+      const {fileTypes} = metadata
+      
+
+      if(fileTypes) {
+        for(const fileType of fileTypes) {
+          fileLoaderDict[fileType] = {id: k, ...metadata}
+        }
+      }
+    }
   }
+
+
 
   const addonModels: AddonModel[] = []
   const FreeSystemPromptModelIDs: AddonModelID[] = []
@@ -838,6 +862,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
       defaultModelId,
       FreeSystemPromptModelIDs,
       addinModifiers,
+      fileLoaderDict,
       addonModels,
       ...(await serverSideTranslations(locale ?? 'en', [
         'common',

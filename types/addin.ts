@@ -5,4 +5,13 @@ export interface AddinModifier {
   icon?: string;
 }
 
+export interface FileLoader {
+  id: string;
+  name: string;
+  description: string;
+  fileTypes: string[];
+}
+
+
+
 export type AddinModifierID = string;

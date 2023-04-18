@@ -9,8 +9,8 @@ import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module
 
 
 export const metadata = {
-    name: 'gpt-3.5-turbo',
-    description: 'this is the model agent of openai gpt3.5-turbo',
+    name: 'chatGPT (turbo)',
+    description: 'this is the model agent of openai gpt-3.5-turbo',
     env: ["OPENAI_API_KEY"],
     supportBrowser: true,
     supportAnalysisMode: true,

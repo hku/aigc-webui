@@ -6,4 +6,5 @@ export const OPENAI_API_HOST =
 
 
 export const MAX_TOKEN_COUNT = 3000
+export const LOW_TOKEN_COUNT = 1500
 

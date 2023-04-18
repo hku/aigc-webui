@@ -22,13 +22,14 @@ import { ChatMessage } from './ChatMessage';
 import { ErrorMessageDiv } from './ErrorMessageDiv';
 import { ModelSelect } from './ModelSelect';
 import { SystemPrompt } from './SystemPrompt';
-import { AddinModifier, AddinModifierID } from '@/types/addin';
+import { AddinModifier, AddinModifierID, FileLoader } from '@/types/addin';
 
 interface Props {
   conversation: Conversation;
   models: AddonModel[];
   defaultModelId: AddonModelID;
   addinModifiers: AddinModifier[];
+  fileLoaderDict: {[key:string]: FileLoader};
   FreeSystemPromptModelIDs: AddonModelID[];
   messageIsStreaming: boolean;
   modelError: ErrorMessage | null;
@@ -53,6 +54,7 @@ export const Chat: FC<Props> = memo(
     models,
     defaultModelId,
     addinModifiers,
+    fileLoaderDict,
     FreeSystemPromptModelIDs,
     messageIsStreaming,
     modelError,
@@ -258,6 +260,7 @@ export const Chat: FC<Props> = memo(
             </div>
 
             <ChatInput
+              fileLoaderDict = {fileLoaderDict}
               addinModifiers = {addinModifiers}
               stopConversationRef={stopConversationRef}
               textareaRef={textareaRef}
