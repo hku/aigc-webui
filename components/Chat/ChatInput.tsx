@@ -34,6 +34,7 @@ import { tokenUtil } from '@/utils/app/tokenUtil';
 import { MAX_TOKEN_COUNT } from '@/utils/app/const';
 import { toast } from 'react-hot-toast';
 import promptModifier from '@/addins';
+import SpeechButton from './speechButton';
 
 interface Props {
   messageIsStreaming: boolean;
@@ -76,15 +77,15 @@ export const ChatInput: FC<Props> = ({
   const [addinId, setAddinId] = useState<AddinModifierID | null>(null);
 
   const promptListRef = useRef<HTMLUListElement | null>(null);
-
+  const refPDFButton = useRef<HTMLButtonElement|null>(null)
+  const refSpeechButton = useRef<HTMLButtonElement|null>(null)
+  
   const filteredPrompts = prompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(promptInputValue.toLowerCase()),
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-
-
     setContent(value);
     updatePromptListVisibility(value);
   };
@@ -118,6 +119,42 @@ export const ChatInput: FC<Props> = ({
       textareaRef.current.blur();
     }
   };
+
+  const _handleSpeechSend = (content: string) => {
+    // if (messageIsStreaming) {
+    //   return;
+    // }
+
+    if (!content) {
+      alert(t('Please enter a message'));
+      return;
+    }
+
+
+    const metadata: MessageMetadata = {}
+    if(tokenUtil.encoding) {
+      const tokens = tokenUtil.encoding.encode(content)
+      let tokenCount = tokens.length;
+      metadata.tokenCount = tokenCount
+    }
+
+    onSend({role: 'user', content,  metadata}, addinId);
+
+    setContent('');
+
+    if (refSpeechButton && refSpeechButton.current) {
+        // triggle onblur
+        refSpeechButton.current.blur()
+        setTimeout(()=>{
+          if(refSpeechButton && refSpeechButton.current) {
+            //for triggle blur next time
+            refSpeechButton.current.focus()
+            //start speech recg again
+            refSpeechButton.current.click()
+          }
+        },2000)
+    }
+  }; 
   
   const handleFileChange = async (file: File) => {
 
@@ -127,11 +164,10 @@ export const ChatInput: FC<Props> = ({
 
 
 
-
     // const matches = /application\/(\w*)$/.exec(file.type)
     // const fileType = matches && matches[1]
 
-    const fileType = (file.name).split('.')[1]
+    const fileType = (file.name).split('.').slice(-1)[0]
 
 
 
@@ -174,6 +210,26 @@ export const ChatInput: FC<Props> = ({
 
   }
 
+  const handleSpeechResult = ({lastContent, text}: {lastContent: string, text: string}) => {
+    console.log(`handleSpeech:${text}`)    
+    text = text.replace(/嗯|呃/g, '')
+
+    const speechCmds: ({reg: RegExp, cmd: ()=> void})[] = [
+      {
+        reg: /^(开始干活)|(回答问题)/,
+        cmd: () => _handleSpeechSend(lastContent)
+      }
+    ]
+
+    for(const {reg, cmd} of speechCmds) {
+      if(reg.test(text)) { 
+        cmd(); 
+        return 
+      }
+    }
+    setContent(lastContent + ' ' + text)
+
+  }
 
   const handleStopConversation = () => {
     stopConversationRef.current = true;
@@ -432,15 +488,12 @@ export const ChatInput: FC<Props> = ({
           {showMore && (
             <div
               className="absolute bottom-full right-10 w-64 py-0 bg-white shadow-md border border-gray-200"
-              onMouseEnter={() => setShowMore(true)}
-              onMouseLeave={() => setShowMore(false)}
+              // onMouseEnter={() => setShowMore(true)}
+              // onMouseLeave={() => setShowMore(false)}
             >
-              <PDFButton onChange={handleFileChange}/>
-              <button 
-              onClick ={()=>{alert("to be done")}}
-              className="flex w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">
-                <IconMicrophone size={18} className="mr-2"/> Speech
-              </button>
+              <PDFButton refbtn={refPDFButton} onChange={handleFileChange}/>
+              <SpeechButton refbtn={refSpeechButton} prefix={content || ''} 
+              onResult={(res) => handleSpeechResult(res)}/>
             </div>
           )}
 
