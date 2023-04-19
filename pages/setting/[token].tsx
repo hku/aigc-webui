@@ -36,12 +36,27 @@ const Setting = () => {
         setTokenValues(_tokenValues)
     } 
 
+
+    const handleClear=()=>{
+        setTokenValues(tokenValues.map(v => ''))
+
+        tokenNames.forEach((n, idx)=>{
+            localStorage.removeItem(n as string)
+        })
+    }
+
     const handleSave=()=>{
         tokenNames.forEach((n, idx)=>{
             localStorage.setItem(n as string, tokenValues[idx] as string)
         })
+        if(tokenValues.some(v => !v?.trim())) {
+            alert("some value is empty.")
+        } else {
+            alert("token saved, you may close the page now.")
+
+        }
     }
-    
+
     useEffect(()=>{
 
         const getTokenValues = async (tokenNames: string[]) => {
@@ -115,8 +130,13 @@ const Setting = () => {
             }
 
                 <button 
+                    onClick={handleClear}                
+                 className="w-full bg-gray-500 text-white py-2 px-4 mb-2 rounded hover:bg-indigo-600 focus:outline-none">{t('clear')}</button>
+
+                <button 
                     onClick={handleSave}                
                  className="w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 focus:outline-none">{t('save')}</button>
+
         </div>
     </div>
 
