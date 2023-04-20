@@ -77,6 +77,8 @@ function sheetToMarkdown(sheet: XLSX.WorkSheet): string {
     .join('\n');
 
 
+
+
   const result = `${headerMarkdown}\n${separator}\n${rowsMarkdown}`;
   return result
 }

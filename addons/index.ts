@@ -57,27 +57,33 @@ class ModelAgent {
           cb()
     }
 
-    async generate(messages: Message[], prompt: string, model: AddonModel) {
+    async generate(messages: Message[], prompt: string, model: AddonModel, tokenValues: (string|null)[]) {
         const {id, env, supportAnalysisMode} = model
         
         const analysisMode = messages.some(m => m.metadata?.marked)
         const isBrowser = (typeof window === 'object')
         
-        let tokens: any[]|null = null
+        let tokens = tokenValues
+        // tokens = tokens.map((t, idx)=> {
+        //     if(t !== null && t !== '' && t !== 'YOUR_KEY') {return t}
+        //     if(env instanceof Array && (!isBrowser)) {
+        //         const tokenName = env[idx]
+        //         const tokenValue = process.env?.[tokenName] || null
+        //         return tokenValue
+        //     }
+        //     return null
+        // })
+
         if(env instanceof Array) {
-            tokens = env.map(v => {
-                const t = isBrowser?(localStorage && localStorage.getItem(v)):(process && process?.env?.[v])
-                return t || null
-            })
             
             for(let i=0; i<env.length; i++) {
                 const t = tokens[i]
-                if(t === null) {
-                    if(isBrowser) {
-                        return `<span style="color:red">The required token is not set, please input the value of ${env[i]} in <a href="/setting/${id}" target="_blank">the setting page</a></span>`
-                    } else {
-                        return `<span style="color:red">To use this model, you need to fill in the ${env[i]} into the '.env.local' file. For details, please refer to the <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a> file</span>`
-                    }
+                if(t === null || t === '' || t === 'YOUR_KEY') {
+                    // if(isBrowser) {
+                    return `<span style="color:red">The required KEY is not set, please input the ${env[i]} value in <a href="/setting/${id}" target="_blank">the setting page</a></span>`
+                    // } else {
+                    //     return `<span style="color:red">To use this model, you need to fill in the ${env[i]} into the '.env.local' file. For details, please refer to the <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a> file</span>`
+                    // }
                 }
             }
         }
@@ -119,7 +125,6 @@ class ModelAgent {
             
             messages = [...markedMessages, lastMessage]
         }
-
 
         this.active = id;
         const obj = this._object[this.active]

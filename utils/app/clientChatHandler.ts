@@ -6,7 +6,7 @@ import modelAgent  from '../../addons';
 import { AddonModel } from '@/types/addon';
 
 
-const clientChatHandler = async (messages: Message[], prompt: string, model: AddonModel): Promise<Response> => {
+const clientChatHandler = async (messages: Message[], prompt: string, model: AddonModel, tokenValues: (string|null)[]): Promise<Response> => {
   try {
     
     const lastMessage = messages.slice(-1)[0]
@@ -25,7 +25,7 @@ const clientChatHandler = async (messages: Message[], prompt: string, model: Add
 
 
 
-    const res = await modelAgent.generate(messages, prompt, model)
+    const res = await modelAgent.generate(messages, prompt, model, tokenValues)
 
     return new Response(res);
 

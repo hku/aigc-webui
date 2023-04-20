@@ -8,6 +8,12 @@ export const metadata = {
     this is a simple model agent for llama-7b deployed on replicate. Sample Input: "Simply put, Quantum Mechanics states that"
 `,
   env: ["REPLICATE_API_TOKEN"],
+  settingInfo: `
+  <p style="font-weight: bold">
+  fill in your API key, which you can get from: 
+  <a href="https://replicate.com" target="_blank" style="color:blue; text-decoration: underline">https://replicate.com</a>
+  </p>
+  `,
 }
 
 export default async function generate(messages: Message[], prompt='', tokens: string[]) {

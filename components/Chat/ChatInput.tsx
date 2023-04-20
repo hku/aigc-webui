@@ -173,8 +173,6 @@ export const ChatInput: FC<Props> = ({
 
     const fileLoader = fileLoaderDict && fileLoaderDict[fileType as string]
 
-    console.log(file.name)
-
     if (fileLoader) {
       try {
         const {content, metadata} = await promptModifier.load_content(file, fileLoader.id)
@@ -182,30 +180,16 @@ export const ChatInput: FC<Props> = ({
         onSend({role: 'user', content,  metadata}, addinId);
 
       } catch(e) {
-        toast.error('failed load the file')
+
+        toast.error('failed load the file ')
         return
       }
 
-    //   let content = (await pdf2text(file)).trim();
-
-
-    //   if (!content) {
-    //     alert(t('Please enter a message'));
-    //     return;
-    //   }
-
-    //   const metadata: MessageMetadata = {}
-    //   if(tokenUtil.encoding) {
-    //     const tokens = tokenUtil.encoding.encode(content)
-    //     let tokenCount = tokens.length;
-    //     metadata.tokenCount = tokenCount
-    //     metadata.fromFile = file.name
-    //   }
-
-    //   content = `## ${file.name}\n\n${content}`
-
     } else {
-      toast.error("file not supported")
+      const supports = new Set<string>(Object.keys(fileLoaderDict));
+      const errorStr = `file not supported, we now support files with extension: ${Array.from(supports).join(',')}`
+      toast.error(errorStr)
+      console.log(errorStr)
     }
 
   }

@@ -12,6 +12,12 @@ export const metadata = {
     name: 'chatGPT (turbo)',
     description: 'this is the model agent of openai gpt-3.5-turbo',
     env: ["OPENAI_API_KEY"],
+    settingInfo: `
+    <p style="font-weight: bold">
+    fill in your API key, which you can get from: 
+    <a href="https://platform.openai.com/account/api-keys" target="_blank" style="color:blue; text-decoration: underline">https://platform.openai.com/account/api-keys</a>
+    </p>
+    `,
     supportBrowser: true,
     supportAnalysisMode: true,
     freeSystemPrompt: true,

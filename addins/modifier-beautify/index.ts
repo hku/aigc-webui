@@ -26,7 +26,7 @@ export const after_input = async (prompt: string) => {
       const appid = (process.env.BAIDU_TRANSLATE_APPID || '').trim()
       const secret = (process.env.BAIDU_TRANSLATE_SECRET || '').trim()
       
-      if(appid === '' || appid === 'YOUR_APPID' || secret === '' || secret === 'YOUR_SECRET') {
+      if(appid === '' || appid === 'YOUR_KEY' || secret === '' || secret === 'YOUR_KEY') {
           return '<span style="color:red">使用百度翻译，您需要申请相关APPID和SECRET，申请链接，详见 <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a></span>'
       }
 

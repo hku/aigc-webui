@@ -13,6 +13,12 @@ export const metadata = {
 The favorable language for this model is English.
 `,
   env: ["REPLICATE_API_TOKEN"],
+  settingInfo: `
+  <p style="font-weight: bold">
+  fill in your API key, which you can get from: 
+  <a href="https://replicate.com" target="_blank" style="color:blue; text-decoration: underline">https://replicate.com</a>
+  </p>
+  `,
 }
 
 export default async function generate(messages: Message[], prompt='', tokens: string[]) {

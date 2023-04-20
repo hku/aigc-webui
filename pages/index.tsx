@@ -117,6 +117,49 @@ const Home: React.FC<HomeProps> = ({
     return message
   }
 
+  const getTokenValues = async (model: AddonModel)=> {
+
+    const _getTokenValues = async (tokenNames: string[]) => {
+                    
+      const res  = await fetch('/api/env', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              tokenNames
+          }),
+      })
+
+      const result = (await res.json()).result      
+      
+      return result
+    }
+    
+    const tokenNames: string[] = model.env || [] 
+    const tokenValues = tokenNames.map(t=>localStorage.getItem(t))
+
+    if(tokenValues.some(t=>t===null)) {
+      
+      const _tokenValues = await _getTokenValues(tokenNames)
+
+      for(let i=0; i<tokenValues.length; i++) {
+        const v = tokenValues[i]  
+        if(v) {continue}
+
+        let _v = _tokenValues[i] || null
+        if(_v === null || _v === '' || _v === 'YOUR_KEY') { _v = null } 
+
+        if(_v !== null) {
+          tokenValues[i] = _v
+          localStorage.setItem(tokenNames[i], _v)
+        }  
+      }
+    }
+
+    return tokenValues    
+  
+  }
   const handleSend = async (
     message: Message,
     deleteCount = 0,
@@ -190,30 +233,37 @@ const Home: React.FC<HomeProps> = ({
         setLoading(true);
         setMessageIsStreaming(true);
         
-        const chatBody: ChatBody = {
-          model: updatedConversation.model,
-          messages: updatedConversation.messages,
-          prompt: updatedConversation.prompt,
-          addinId
-        };
-
-
-        let body;
-
-        body = JSON.stringify(chatBody);
-    
-
-        const controller = new AbortController();
+        const tokenValues = await getTokenValues(updatedConversation.model) 
 
         let response: Response | null = null 
+
+
+        const controller = new AbortController();
 
         if(updatedConversation.model?.supportBrowser) {
           response = await clientChatHandler(
             updatedConversation.messages, 
             updatedConversation.prompt, 
-            updatedConversation.model
+            updatedConversation.model,
+            tokenValues,
           )
         } else {
+
+          const chatBody: ChatBody = {
+            model: updatedConversation.model,
+            messages: updatedConversation.messages,
+            prompt: updatedConversation.prompt,
+            addinId,
+            tokenValues
+          };
+  
+  
+          let body;
+  
+          body = JSON.stringify(chatBody);
+      
+  
+
           response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -223,13 +273,6 @@ const Home: React.FC<HomeProps> = ({
             body,
           });
         }
-
-        
-
-
-
-        
-
 
         if (!response.ok) {
           setLoading(false);

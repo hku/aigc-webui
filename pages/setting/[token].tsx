@@ -3,9 +3,14 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import addonsManifest from "../../addons-manifest.json"
+
 
 type TokenNames = (string | null)[] 
 type TokenValues = (string | null)[] 
+
+
 
 const Setting = () => {
     const { t } = useTranslation('setting');
@@ -14,6 +19,9 @@ const Setting = () => {
     let { token } = router.query
     let modelId  = token as string
 
+    if (!addonsManifest.includes(modelId)) {
+        modelId = "gpt3-5"
+    }
 
     // const env =  {
     // "openai": [
@@ -28,6 +36,8 @@ const Setting = () => {
 
     const [tokenNames, setTokenNames] = useState<TokenNames>([])
     const [tokenValues, setTokenValues] = useState<TokenValues>([])
+    const [settingInfo, setSettingInfo] = useState<string>('')
+    const [modelName, setModelName] = useState<string>('')
 
 
     const handleChange = (e: any, idx: number) => {
@@ -43,16 +53,23 @@ const Setting = () => {
         tokenNames.forEach((n, idx)=>{
             localStorage.removeItem(n as string)
         })
+
+        const msg = "values are cleared."
+        toast.success(msg)
+
     }
 
     const handleSave=()=>{
         tokenNames.forEach((n, idx)=>{
-            localStorage.setItem(n as string, tokenValues[idx] as string)
+            localStorage.setItem(n as string, tokenValues[idx]?.trim() as string)
         })
         if(tokenValues.some(v => !v?.trim())) {
-            alert("some value is empty.")
+            const msg = "some value is empty."
+            toast.error(msg)
         } else {
-            alert("token saved, you may close the page now.")
+            const msg = "token saved, you may close the page now."
+            toast.success(msg)
+            // alert(msg)
 
         }
     }
@@ -79,10 +96,17 @@ const Setting = () => {
         const initTokens = async (modelId: string)=>{
 
             let _tokenNames: TokenNames = []
-             
+            let _settingInfo = ''  
+            let _modelName = ''
+
             try {
                 const scriptModule = await import(`../../addons/${modelId}/model`);
+
+
                 _tokenNames = scriptModule.metadata.env
+                _settingInfo = scriptModule.metadata.settingInfo || ''
+                _modelName = scriptModule.metadata.name || ''
+
             } catch(e) {
                 console.log(e)
                 return 
@@ -91,7 +115,9 @@ const Setting = () => {
             
             setTokenNames(_tokenNames)
             setTokenValues(_tokenValues)
-       
+            setSettingInfo(_settingInfo)
+            setModelName(_modelName)
+
             if (_tokenValues.some(v=>!v)) {
                 const _values = await getTokenValues(_tokenNames as string[])
 
@@ -99,7 +125,7 @@ const Setting = () => {
                     _tokenValues[i] = _tokenValues[i] || _values[i]
                 }
                 setTokenValues(_tokenValues)
-                setTimeout(handleSave , 1000)
+                // setTimeout(handleSave , 1000)
             }
         }
 
@@ -112,8 +138,14 @@ const Setting = () => {
 
     return (<>
     <div className="container mx-auto min-h-screen flex items-center justify-center">
-        <div className="bg-white p-8 rounded shadow-md w-96">
-            <h1 className="text-2xl font-bold mb-6 text-center">{token} Setting</h1>
+        <div className="bg-white p-8 rounded shadow-md w-full">
+            <h1 className="text-2xl font-bold mb-4 text-center">{modelName} Setting</h1>
+            <div
+                className="w-full  text-gray-900 mb-6"
+                dangerouslySetInnerHTML={{
+                    __html: settingInfo,
+                }}
+            />
             {
                 tokenNames.map((n, idx) => {
                     return (
@@ -126,17 +158,15 @@ const Setting = () => {
                     </div>
                     )
                 })
-
             }
+{/* 
+            <button 
+                onClick={handleClear}                
+                className="w-full bg-gray-500 text-white py-2 px-4 mb-2 rounded focus:outline-none">{t('clear')}</button> */}
 
-                <button 
-                    onClick={handleClear}                
-                 className="w-full bg-gray-500 text-white py-2 px-4 mb-2 rounded hover:bg-indigo-600 focus:outline-none">{t('clear')}</button>
-
-                <button 
-                    onClick={handleSave}                
-                 className="w-full bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 focus:outline-none">{t('save')}</button>
-
+            <button 
+                onClick={handleSave}                
+                className="w-full bg-indigo-500 text-white py-2 px-4 mb-2 rounded hover:bg-indigo-600 focus:outline-none">{t('save')}</button>
         </div>
     </div>
 
@@ -156,6 +186,7 @@ const Setting = () => {
 
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+    
     return {
     props: {
         ...(await serverSideTranslations(locale ?? 'en', [

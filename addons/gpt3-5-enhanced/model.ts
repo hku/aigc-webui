@@ -20,6 +20,13 @@ This is a model agent of chatGPT enhanced by stable diffusion and riffusion, whi
 The favorable language for Image and Music generation is English.
 `,
   env: ["OPENAI_API_KEY", "REPLICATE_API_TOKEN"],
+  settingInfo: `
+  <p style="font-weight: bold">
+  Some KEY is missed, which you can get from: <br/>
+  <a href="https://platform.openai.com/account/api-keys" target="_blank" style="color:blue; text-decoration: underline">OPENAI_API_KEY</a><br/>
+  <a href="https://replicate.com" target="_blank" style="color:blue; text-decoration: underline">REPLICATE_API_TOKEN</a>
+  </p>
+  `,
 }
 
 export default async function generate(messages: Message[], prompt='', tokens: string[]) {

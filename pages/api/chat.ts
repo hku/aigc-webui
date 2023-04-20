@@ -13,7 +13,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     const chatbody = (await req.json()) as ChatBody;
 
-    let { messages, prompt, model, addinId} = chatbody;
+    let { messages, prompt, model, addinId, tokenValues} = chatbody;
 
 
 
@@ -32,7 +32,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
 
-    const res = await modelAgent.generate(messages, prompt, model)
+    const res = await modelAgent.generate(messages, prompt, model, tokenValues)
 
     return new Response(res);
 

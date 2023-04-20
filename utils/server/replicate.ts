@@ -25,7 +25,7 @@ export class ReplicateClient {
         const token = this.token.trim()
         const model_id = this.model_id as ModelId
         
-        if(token === '' || token === 'YOUR_TOKEN') {
+        if(token === '' || token === 'YOUR_KEY') {
             throw new ReplicateNoTokenError(`To use this model, you need to apply for a replicate API_TOKEN, and fill in the API_TOKEN into the '.env.local' file. For details, please refer to the <a target="_blank" href="https://github.com/hku/aigc-webui/blob/main/README.md">README.md</a> file`)
         }
         
