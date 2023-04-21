@@ -67,19 +67,19 @@ function sheetToMarkdown(sheet: XLSX.WorkSheet): string {
     if (row !== startRow) data.push(rowData);
   }
 
-  const headerMarkdown = '|' + headers.map((header) => ` ${header} `).join('|') + '|';
-  const separator = '|' + headers.map(() => '----').join('|') + '|';
+  const headerMarkdown = '| ' + headers.map((header) => ` ${header} `).join(' | ') + ' |';
+  const separator = '| ' + headers.map(() => '----').join(' | ') + ' |';
 
   const rowsMarkdown = data
     .map((row) =>
-    '|' + row.map((cell) => `${cell} `).join('|') + '|'
+    '| ' + row.map((cell) => `${cell} `).join(' | ') + ' |'
     )
     .join('\n');
 
 
 
 
-  const result = `${headerMarkdown}\n${separator}\n${rowsMarkdown}`;
+  const result = `\n${headerMarkdown}\n${separator}\n${rowsMarkdown}\n`;
   return result
 }
 

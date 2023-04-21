@@ -475,7 +475,10 @@ export const ChatInput: FC<Props> = ({
               // onMouseEnter={() => setShowMore(true)}
               // onMouseLeave={() => setShowMore(false)}
             >
-              <PDFButton refbtn={refPDFButton} onChange={handleFileChange}/>
+              <PDFButton refbtn={refPDFButton} onChange={(file)=>{
+                handleFileChange(file)
+                setShowMore(false)
+              }}/>
               <SpeechButton refbtn={refSpeechButton} prefix={content || ''} 
               onResult={(res) => handleSpeechResult(res)}/>
             </div>

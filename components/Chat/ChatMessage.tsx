@@ -223,9 +223,9 @@ export const ChatMessage: FC<Props> = memo(
                   >
                     <IconStarFilled size={20} className={`translate-x-2 ${message.metadata?.marked?"text-green-500":""}`}/>
                   </button>                
-                  <div className="absolute w-48 left-10 -mt-24 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
+                  {/* <div className="absolute w-48 left-10 -mt-24 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
                     when some of the green Lanterns are lighted, the gpt answer will focus on the lighted messages.
-                    </div>
+                    </div> */}
                   </div>
                   
                   
@@ -301,10 +301,10 @@ export const ChatMessage: FC<Props> = memo(
                   >
                     <IconStarFilled size={20} className={`translate-x-2 ${message.metadata?.marked?"text-green-500":""}`}/>
                   </button>
-
+{/* 
                     <div className="absolute w-48 left-10 -mt-24 px-2 py-1 text-xs text-white bg-gray-500 rounded opacity-0 group-hover:opacity-100 transition duration-300">
                     when some of the green Lanterns are lighted, the gpt answer will focus on the lighted messages.
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
