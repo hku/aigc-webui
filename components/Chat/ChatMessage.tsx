@@ -7,6 +7,8 @@ import {
   IconUser,
   IconStar,
   IconStarFilled,
+  IconCircle,
+  IconCircleMinus,
 } from '@tabler/icons-react';
 import { useTranslation } from 'next-i18next';
 import { FC, memo, useEffect, useRef, useState } from 'react';
@@ -23,10 +25,11 @@ interface Props {
   messageIndex: number;
   hasMarker?: boolean;
   onEditMessage: (message: Message, messageIndex: number, update?: boolean) => void;
+  onDeleteMessage: (messageIndex: number) => void;
 }
 
 export const ChatMessage: FC<Props> = memo(
-  ({ message, messageIndex, onEditMessage, hasMarker=false}) => {
+  ({ message, messageIndex, onEditMessage, onDeleteMessage, hasMarker=false}) => {
     const { t } = useTranslation('chat');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -55,6 +58,7 @@ export const ChatMessage: FC<Props> = memo(
       }
       setIsEditing(false);
     };
+
 
     const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !isTyping && !e.shiftKey) {
@@ -223,11 +227,48 @@ export const ChatMessage: FC<Props> = memo(
                     when some of the green Lanterns are lighted, the gpt answer will focus on the lighted messages.
                     </div>
                   </div>
+                  
+                  
+
+                  </div>
+                )}
+
+                {(!isEditing) && (
+                  <div
+                    className={`absolute ${
+                      window.innerWidth < 640
+                        ? 'bottom-1 left-0'
+                        : 'left-[-100px] top-[26px] m-0'
+                    }`}
+                  > 
+                  <button
+                    className={`translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300`}
+                    onClick={()=> {onDeleteMessage(messageIndex)}}
+                  >
+                    <IconCircleMinus size={20} />
+                  </button>
                   </div>
                 )}
               </div>
             ) : (
               <>
+
+              
+                <div
+                    className={`absolute ${
+                      window.innerWidth < 640
+                        ? 'bottom-1 left-0'
+                        : 'left-[-100px] top-[26px] m-0'
+                    }`}
+                  > 
+                  <button
+                    className={`translate-x-[1000px] text-gray-500 hover:text-gray-700 focus:translate-x-0 group-hover:translate-x-0 dark:text-gray-400 dark:hover:text-gray-300`}
+                    onClick={()=> {onDeleteMessage(messageIndex)}}
+                  >
+                    <IconCircleMinus size={20} />
+                  </button>
+                </div>
+                
                 <div
                   className={`absolute ${
                     window.innerWidth < 640

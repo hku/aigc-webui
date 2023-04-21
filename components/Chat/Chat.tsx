@@ -45,6 +45,7 @@ interface Props {
     data: KeyValuePair,
   ) => void;
   onEditMessage: (message: Message, messageIndex: number, update?: boolean) => void;
+  onDeleteMessage: (messageIndex: number) => void;
   stopConversationRef: MutableRefObject<boolean>;
 }
 
@@ -63,6 +64,7 @@ export const Chat: FC<Props> = memo(
     onSend,
     onUpdateConversation,
     onEditMessage,
+    onDeleteMessage,
     stopConversationRef,
   }) => {
 
@@ -246,6 +248,7 @@ export const Chat: FC<Props> = memo(
                       message={message}
                       messageIndex={index}
                       onEditMessage={onEditMessage}
+                      onDeleteMessage={onDeleteMessage}
                     />
                   ))}
 

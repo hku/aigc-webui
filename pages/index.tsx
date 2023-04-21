@@ -562,6 +562,29 @@ const Home: React.FC<HomeProps> = ({
     saveFolders(updatedFolders);
   };
 
+  const handleDeleteMessage = (messageIndex: number) => {
+    if (selectedConversation) {
+
+      let updatedMessages = selectedConversation.messages;
+      updatedMessages.splice(messageIndex, 1)
+
+      const updatedConversation = {
+        ...selectedConversation,
+        messages: updatedMessages,
+      };
+
+      const { single, all } = updateConversation(
+        updatedConversation,
+        conversations,
+      );
+
+      setSelectedConversation(single);
+      setConversations(all);
+      
+    }
+  }
+
+
   const handleEditMessage = (message: Message, messageIndex: number, update:boolean = true) => {
 
     if (selectedConversation) {
@@ -574,7 +597,7 @@ const Home: React.FC<HomeProps> = ({
       //     }
       //   })
       //   .filter((m) => m) as Message[]:selectedConversation.messages;
-      update?selectedConversation.messages.slice(0, messageIndex):selectedConversation.messages
+      // update?selectedConversation.messages.slice(0, messageIndex):selectedConversation.messages
 
       let updatedMessages = selectedConversation.messages;
       if(update) {
@@ -808,6 +831,7 @@ const Home: React.FC<HomeProps> = ({
                 onSend={handleSend}
                 onUpdateConversation={handleUpdateConversation}
                 onEditMessage={handleEditMessage}
+                onDeleteMessage={handleDeleteMessage}
                 stopConversationRef={stopConversationRef}
               />
             </div>

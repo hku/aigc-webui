@@ -10,14 +10,23 @@
 
 ### 软件功能
  
-- 可切换的AI创作模型，例如 ChatGPT，LLaMA，Stable Diffusion，Riffusion ... 或者你自己制作的AI模型
+- 可切换的AI创作模型，例如 ChatGPT，LLaMA，Stable Diffusion，Riffusion stableLM... 或者你自己制作的AI模型
 - 多模态的输出，如image，audio，codeblock等
-- "chatPDF"功能, 你可以导入pdf文件, 然后在“分析模式”下，和这些文件“对话”.
+- 多模态的输入，支持文本、文件、语音多种输入方式
+- "chatPDF"功能, 你可以导入pdf，doc, docx，txt等文件, 然后在“分析模式”下，和这些文件“对话”.
+- "chatExcel" 功能，你可以导入 excel 文件，然后通过prompt处理这些表格
 - 自带强化ChatGPT的插件，使ChatGPT可以绘画、作曲
 - 可切换的提示词预处理器，例如自动翻译，自动优化提示词（用户生成图画）
 - 可扩展、易开发的模型代理 （[开发指南](docs/Contributing.md)）
 - 可扩展、易开发的提示词预处理器（[开发指南](docs/Contributing.md)）
-- 可定制的预置提示词
+- 支持对话历史的修改、删除、重点分析等管理操作
+- 支持系统提示词的修改、删除、等管理操作
+- （其他）
+
+## TODO
+
+- 支持图片的上传和处理
+- 支持音视频的上传和处理
 - （其他）
 
 ## 快速安装

@@ -159,10 +159,10 @@ const Setting = () => {
                     )
                 })
             }
-{/* 
+
             <button 
                 onClick={handleClear}                
-                className="w-full bg-gray-500 text-white py-2 px-4 mb-2 rounded focus:outline-none">{t('clear')}</button> */}
+                className="w-full bg-gray-500 text-white py-2 px-4 mb-2 rounded focus:outline-none">{t('clear')}</button>
 
             <button 
                 onClick={handleSave}                
