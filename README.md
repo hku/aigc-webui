@@ -12,11 +12,20 @@ Screenshot:
  
 - A variety of AIGC models to choose from, such as ChatGPT, LLaMA, Stable Diffusion，Riffusion, or some cool models you make by yourself.
 - Multimodal generation ability, such as images, musics, code blocks, and so on.
-- chatPDF, you can upload pdf files, and chat with the file in analysis mode.
+- Multimodal inputs are supported, including text, file, and voice inputs.
+- chatPDF, you can import pdf files, and chat with the file in analysis mode.
+- chatExcel, you can import Excel files and then process these tables through prompts or voice instructions.
 - Comes with an addon, named `gpt3-5-enhanced`, that enrich ChatGPT with the ability to generate images and musics.
 - Comes with an addin, named `translate`, that can translates user input automatically, and another plugin `beautify` than can optimize user's prompt for image generation.
 - An extendable framework, easy to make your own extension. （[Guidelines](docs/Contributing.md)）
+- Conversation and Message management.
 - predefined prompt shortcuts
+- etc.
+
+## TODO
+
+- images input
+- audio/video input
 - etc.
 
 ## Installation and Running
@@ -80,4 +89,4 @@ aigc-webui has a simple pluggable structure. You can develop your own extensions
 
 ### Contact
 
-If you have any questions, feel free to reach out to me on [Facebook](https://www.facebook.com/kun.huang.750).
+If you have any questions, feel free to reach out to me on [Twitter](https://twitter.com/RayWong48889131).
