@@ -8,6 +8,8 @@
 
 ![screenshot](./images/screenshoot.jpg)
 
+![screenshot2](./images/screenshoot2.jpg)
+
 ### 软件功能
  
 - 可切换的AI创作模型，例如 ChatGPT，LLaMA，Stable Diffusion，Riffusion stableLM... 或者你自己制作的AI模型

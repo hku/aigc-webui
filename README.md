@@ -8,6 +8,8 @@ Screenshot:
 
 ![screenshot](./docs/images/screenshoot.jpg)
 
+![screenshot2](../docs/images/screenshoot2.jpg)
+
 ### Features
  
 - A variety of AIGC models to choose from, such as ChatGPT, LLaMA, Stable Diffusion，Riffusion, or some cool models you make by yourself.
