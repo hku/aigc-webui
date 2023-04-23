@@ -8,7 +8,7 @@ Screenshot:
 
 ![screenshot](./docs/images/screenshoot.jpg)
 
-![screenshot2](../docs/images/screenshoot2.jpg)
+![screenshot2](./docs/images/screenshoot2.jpg)
 
 ### Features
  
