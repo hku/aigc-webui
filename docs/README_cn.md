@@ -33,6 +33,8 @@
 
 ## 快速安装
 
+[安装使用的视频教程](https://www.bilibili.com/video/BV1nh411j7Au)
+
 ### Windows 系统
 
 你可以通过双击项目中的 `webui.bat` **自动安装**和运行程序，你也可以自己手动安装：

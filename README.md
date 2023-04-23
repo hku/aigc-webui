@@ -32,6 +32,8 @@ Screenshot:
 
 ## Installation and Running
 
+[video tutorial](https://www.youtube.com/watch?v=dgZGM8208m4)
+
 ### For Windows User
 
 You can **automatically install** and run this project  by simply double-clicking the `webui.bat` after downloading this project, or you may choose to install it manually by yourself:
