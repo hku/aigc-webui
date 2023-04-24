@@ -8,7 +8,7 @@ const replicate = new Replicate({
 });
 
 export const metadata = {
-    name: 'replicate-stable-diffusion',
+    name: 'replicate-stable-anime',
     description: `
 This is a model agent for image generation powered by stable-diffusion api on replicate.
 The favorable language for this model is English.    
@@ -28,8 +28,8 @@ export default async function generate(messages: Message[], prompt='', tokens: s
     
   const client =new ReplicateClient(
     tokens[0],
-    // "cjwbw/anything-v3-better-vae:09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65",
-    "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
+    "cjwbw/anything-v3-better-vae:09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65",
+    // "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
   )
 
   try{
